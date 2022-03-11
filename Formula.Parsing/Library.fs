@@ -47,12 +47,20 @@ module private impl =
     let fragFunc =
         pipe2 fragIdentStr (fragParens (sepBy fragExpr (fragStr ","))) (fun name args -> FunctionExpr(name, args))
 
+    // Property
+    let fragProp =
+        pipe2 (fragIdentStr .>> (fragStr "!")) fragIdentStr (fun receiver prop -> PropertyExpr(receiver, prop))
+
+    // Identifier
+    let fragIdent = fragIdentStr |>> Ident
+
     // Operator precedence parser
     opp.TermParser <-
         fragNumber
         <|> between (fragStr "(") (fragStr ")") fragExpr
         <|> attempt fragFunc
-        <|> (fragIdentStr |>> Ident)
+        <|> attempt fragProp
+        <|> fragIdent
 
     opp.AddOperator(InfixOperator("+", ws, 10, Associativity.Left, (fun x y -> AddOp(x, y))))
     opp.AddOperator(InfixOperator("-", ws, 10, Associativity.Left, (fun x y -> SubtractOp(x, y))))

@@ -9,6 +9,9 @@ type Expression =
 
     // Identifier
     | Ident of string
+    
+    // Property
+    | PropertyExpr of string * string
 
     // Unary Operator
     | NegateOp of Expression
