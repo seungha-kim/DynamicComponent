@@ -8,6 +8,8 @@ type Expression =
     | TextLit of string
 
     // Unary Operator
+    | NegateOp of Expression
+
     // Binary Operator
     | AddOp of Expression * Expression
     | MultiplyOp of Expression * Expression

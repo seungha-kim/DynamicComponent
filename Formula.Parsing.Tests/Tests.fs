@@ -10,7 +10,7 @@ let ctx = DummyParsingContext()
 
 let expressionData: obj [] list =
     [ [| "1"; NumberLit "1" |]
-      [| "-1"; NumberLit "-1" |]
+      [| "-1"; NegateOp(NumberLit "1") |]
       [| "    1"; NumberLit "1" |]
       [| "1    "; NumberLit "1" |]
       [| "111"; NumberLit "111" |]

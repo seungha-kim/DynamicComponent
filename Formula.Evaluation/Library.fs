@@ -26,6 +26,7 @@ module private impl =
     let rec private evaluateAsNumber ctx expr =
         match expr with
         | NumberLit s -> Convert.ToSingle(s)
+        | NegateOp operand -> (evaluateAsNumber ctx operand) * -1.0f 
         | AddOp (lhs, rhs) ->
             (evaluateAsNumber ctx lhs)
             + (evaluateAsNumber ctx rhs)
