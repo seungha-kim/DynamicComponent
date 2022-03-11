@@ -25,15 +25,15 @@ module private funcs =
 module private impl =
     let rec private evaluateAsNumber ctx expr =
         match expr with
-        | NumberLiteral s -> Convert.ToSingle(s)
-        | AddOperator (lhs, rhs) ->
+        | NumberLit s -> Convert.ToSingle(s)
+        | AddOp (lhs, rhs) ->
             (evaluateAsNumber ctx lhs)
             + (evaluateAsNumber ctx rhs)
-        | MultiplyOperator (lhs, rhs) ->
+        | MultiplyOp (lhs, rhs) ->
             (evaluateAsNumber ctx lhs)
             * (evaluateAsNumber ctx rhs)
-        | FunctionExpression (name, args) -> evaluateFunctionAsNumber ctx name args
-        | InvalidExpression _ -> 0.0f
+        | FunctionExpr (name, args) -> evaluateFunctionAsNumber ctx name args
+        | InvalidExpr _ -> 0.0f
 
     and evaluateFunctionAsNumber ctx name args =
         match name.ToUpper() with

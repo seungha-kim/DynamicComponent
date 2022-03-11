@@ -4,15 +4,16 @@ open System.Collections.Generic
 
 type Expression =
     // Literal
-    | NumberLiteral of string
-    | TextLiteral of string
+    | NumberLit of string
+    | TextLit of string
 
+    // Unary Operator
     // Binary Operator
-    | AddOperator of Expression * Expression
-    | MultiplyOperator of Expression * Expression
+    | AddOp of Expression * Expression
+    | MultiplyOp of Expression * Expression
     
     // Function
-    | FunctionExpression of string * IEnumerable<Expression>
+    | FunctionExpr of string * IEnumerable<Expression>
 
     // Misc
-    | InvalidExpression of string
+    | InvalidExpr of string

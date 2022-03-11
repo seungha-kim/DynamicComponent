@@ -23,37 +23,37 @@ namespace Formulas.Evaluation.Tests
         {
             return new[]
             {
-                new object[] {NewNumberLiteral("1"), 1.0f},
-                new object[] {NewNumberLiteral("1.0"), 1.0f},
-                new object[] {NewNumberLiteral("2.0"), 2.0f},
-                new object[] {NewNumberLiteral("-1"), -1.0f},
-                new object[] {NewNumberLiteral("-1.0"), -1.0f},
+                new object[] {NewNumberLit("1"), 1.0f},
+                new object[] {NewNumberLit("1.0"), 1.0f},
+                new object[] {NewNumberLit("2.0"), 2.0f},
+                new object[] {NewNumberLit("-1"), -1.0f},
+                new object[] {NewNumberLit("-1.0"), -1.0f},
                 new object[]
                 {
-                    NewFunctionExpression("ADD", new[]
+                    NewFunctionExpr("ADD", new[]
                     {
-                        NewNumberLiteral("1"),
-                        NewNumberLiteral("2"),
+                        NewNumberLit("1"),
+                        NewNumberLit("2"),
                     }),
                     3.0f
                 },
                 new object[]
                 {
-                    NewFunctionExpression("ABS", new[]
+                    NewFunctionExpr("ABS", new[]
                     {
-                        NewNumberLiteral("-1"),
+                        NewNumberLit("-1"),
                     }),
                     1.0f
                 },
                 // multiple functions
                 new object[]
                 {
-                    NewFunctionExpression("ABS", new[]
+                    NewFunctionExpr("ABS", new[]
                     {
-                        NewFunctionExpression("ADD", new[]
+                        NewFunctionExpr("ADD", new[]
                         {
-                            NewNumberLiteral("-1"),
-                            NewNumberLiteral("10"),
+                            NewNumberLit("-1"),
+                            NewNumberLit("10"),
                         })
                     }),
                     9.0f

@@ -39,10 +39,10 @@ module private impl =
 
     let fragNumber =
         numberLiteral numOpts "number" .>> ws
-        |>> fun lit -> Expression.NumberLiteral lit.String
+        |>> fun lit -> Expression.NumberLit lit.String
 
     // Functions
-    let fragFunc = pipe2 fragIdent (fragParens (sepBy fragExpr (fragStr ","))) (fun name args -> FunctionExpression(name, args))
+    let fragFunc = pipe2 fragIdent (fragParens (sepBy fragExpr (fragStr ","))) (fun name args -> FunctionExpr(name, args))
     
     // Operator precedence parser
 
@@ -51,8 +51,8 @@ module private impl =
         <|> fragFunc
         <|> between (fragStr "(") (fragStr ")") fragExpr
 
-    opp.AddOperator(InfixOperator("+", ws, 10, Associativity.Left, (fun x y -> AddOperator(x, y))))
-    opp.AddOperator(InfixOperator("*", ws, 20, Associativity.Left, (fun x y -> MultiplyOperator(x, y))))
+    opp.AddOperator(InfixOperator("+", ws, 10, Associativity.Left, (fun x y -> AddOp(x, y))))
+    opp.AddOperator(InfixOperator("*", ws, 20, Associativity.Left, (fun x y -> MultiplyOp(x, y))))
 
     let pExpression = ws >>. fragExpr .>> eof
 
@@ -61,6 +61,6 @@ module private impl =
             member this.Parse(ctx, input) =
                 match run pExpression input with
                 | Success (expression, unit, position) -> expression
-                | Failure (s, parserError, unit) -> InvalidExpression(parserError.Messages.ToString())
+                | Failure (s, parserError, unit) -> InvalidExpr(parserError.Messages.ToString())
 
 let createParser () = impl.FormulaParser() :> IFormulaParser
