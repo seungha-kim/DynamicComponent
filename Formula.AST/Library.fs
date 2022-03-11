@@ -7,6 +7,9 @@ type Expression =
     | NumberLit of string
     | TextLit of string
 
+    // Identifier
+    | Ident of string
+
     // Unary Operator
     | NegateOp of Expression
 
@@ -14,7 +17,7 @@ type Expression =
     | AddOp of Expression * Expression
     | SubtractOp of Expression * Expression
     | MultiplyOp of Expression * Expression
-    
+
     // Function
     | FunctionExpr of string * IEnumerable<Expression>
 

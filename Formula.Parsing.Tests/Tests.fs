@@ -34,6 +34,10 @@ let expressionData: obj [] list =
       [| "- 1 - - 2"
          SubtractOp(NegateOp(NumberLit "1"), NegateOp(NumberLit "2")) |]
 
+      // Identifier
+      [| "Ident"; Ident "Ident" |]
+      [| "ABS"; Ident "ABS" |]
+      
       // Function expression
       [| "ABS(1)"
          FunctionExpr("ABS", [ NumberLit "1" ]) |]

@@ -29,8 +29,10 @@ module private impl =
         || c = '_'
         || c = '\''
 
-    let fragIdent =
-        identifier (IdentifierOptions(isAsciiIdStart = isAsciiIdStart, isAsciiIdContinue = isAsciiIdContinue)) .>> ws
+    let identOpts =
+        IdentifierOptions(isAsciiIdStart = isAsciiIdStart, isAsciiIdContinue = isAsciiIdContinue)
+
+    let fragIdentStr = identifier identOpts .>> ws
 
     // Literals
     let numOpts =
@@ -42,14 +44,15 @@ module private impl =
         |>> fun lit -> Expression.NumberLit lit.String
 
     // Functions
-    let fragFunc = pipe2 fragIdent (fragParens (sepBy fragExpr (fragStr ","))) (fun name args -> FunctionExpr(name, args))
-    
-    // Operator precedence parser
+    let fragFunc =
+        pipe2 fragIdentStr (fragParens (sepBy fragExpr (fragStr ","))) (fun name args -> FunctionExpr(name, args))
 
+    // Operator precedence parser
     opp.TermParser <-
         fragNumber
-        <|> fragFunc
         <|> between (fragStr "(") (fragStr ")") fragExpr
+        <|> attempt fragFunc
+        <|> (fragIdentStr |>> Ident)
 
     opp.AddOperator(InfixOperator("+", ws, 10, Associativity.Left, (fun x y -> AddOp(x, y))))
     opp.AddOperator(InfixOperator("-", ws, 10, Associativity.Left, (fun x y -> SubtractOp(x, y))))
