@@ -30,6 +30,9 @@ module private impl =
         | AddOp (lhs, rhs) ->
             (evaluateAsNumber ctx lhs)
             + (evaluateAsNumber ctx rhs)
+        | SubtractOp(lhs, rhs) ->
+            (evaluateAsNumber ctx lhs)
+            - (evaluateAsNumber ctx rhs)
         | MultiplyOp (lhs, rhs) ->
             (evaluateAsNumber ctx lhs)
             * (evaluateAsNumber ctx rhs)

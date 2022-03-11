@@ -28,6 +28,7 @@ namespace Formulas.Evaluation.Tests
                 new object[] {NewNumberLit("2.0"), 2.0f},
                 new object[] {NewNumberLit("-1"), -1.0f},
                 new object[] {NewNumberLit("-1.0"), -1.0f},
+                new object[] {NewSubtractOp(NewNumberLit("1"), NewNumberLit("2")), -1.0f},
                 new object[]
                 {
                     NewFunctionExpr("ADD", new[]

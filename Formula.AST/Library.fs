@@ -12,6 +12,7 @@ type Expression =
 
     // Binary Operator
     | AddOp of Expression * Expression
+    | SubtractOp of Expression * Expression
     | MultiplyOp of Expression * Expression
     
     // Function

@@ -52,6 +52,7 @@ module private impl =
         <|> between (fragStr "(") (fragStr ")") fragExpr
 
     opp.AddOperator(InfixOperator("+", ws, 10, Associativity.Left, (fun x y -> AddOp(x, y))))
+    opp.AddOperator(InfixOperator("-", ws, 10, Associativity.Left, (fun x y -> SubtractOp(x, y))))
     opp.AddOperator(InfixOperator("*", ws, 20, Associativity.Left, (fun x y -> MultiplyOp(x, y))))
     opp.AddOperator(PrefixOperator("-", ws, 30, true, (fun x -> NegateOp x)))
 
