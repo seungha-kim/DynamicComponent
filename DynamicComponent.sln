@@ -4,21 +4,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilInterface", "UtilInterf
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Practice", "Practice\Practice.fsproj", "{6F305221-4AD5-4A38-8EE9-9BD17A17FEE6}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FormulaParsing", "FormulaParsing\FormulaParsing.fsproj", "{BCC16FA0-0399-4FBC-96CF-622F9C887663}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Formula.Parsing", "Formula.Parsing\Formula.Parsing.fsproj", "{BCC16FA0-0399-4FBC-96CF-622F9C887663}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaEvaluationTest", "FormulaEvaluationTest\FormulaEvaluationTest.csproj", "{B555A005-4B42-4720-9351-E1B08FC65EE6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Formula.Evaluation.Tests", "Formula.Evaluation.Tests\Formula.Evaluation.Tests.csproj", "{B555A005-4B42-4720-9351-E1B08FC65EE6}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FormulaAST", "FormulaAST\FormulaAST.fsproj", "{B31AB31C-DA1E-46BE-8522-207CE9F45003}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Formula.AST", "Formula.AST\Formula.AST.fsproj", "{B31AB31C-DA1E-46BE-8522-207CE9F45003}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaInterface", "FormulaInterface\FormulaInterface.csproj", "{484317E1-3A6A-4075-8089-9CF5F469873D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Formula.Interface", "Formula.Interface\Formula.Interface.csproj", "{484317E1-3A6A-4075-8089-9CF5F469873D}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FormulaEvaluation", "FormulaEvaluation\FormulaEvaluation.fsproj", "{A4876C75-38CB-4546-B3B8-0A0C59E377EE}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Formula.Evaluation", "Formula.Evaluation\Formula.Evaluation.fsproj", "{A4876C75-38CB-4546-B3B8-0A0C59E377EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaTest", "FormulaTest\FormulaTest.csproj", "{CF460616-9227-45FF-ABB1-A29AFCFFC980}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Formula.Tests", "Formula.Tests\Formula.Tests.csproj", "{CF460616-9227-45FF-ABB1-A29AFCFFC980}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FormulaParsingTest", "FormulaParsingTest\FormulaParsingTest.fsproj", "{496D3CAB-C792-42BA-8100-6CAA5E731171}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Formula.Parsing.Tests", "Formula.Parsing.Tests\Formula.Parsing.Tests.fsproj", "{496D3CAB-C792-42BA-8100-6CAA5E731171}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaTestUtil", "FormulaTestUtil\FormulaTestUtil.csproj", "{5F218EAD-A153-4A06-B59D-800F23895EF9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Formula.TestUtil", "Formula.TestUtil\Formula.TestUtil.csproj", "{5F218EAD-A153-4A06-B59D-800F23895EF9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Formula", "Formula", "{BB3788CB-A8A5-4236-B064-902D5775A118}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,5 +68,15 @@ Global
 		{5F218EAD-A153-4A06-B59D-800F23895EF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F218EAD-A153-4A06-B59D-800F23895EF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F218EAD-A153-4A06-B59D-800F23895EF9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B31AB31C-DA1E-46BE-8522-207CE9F45003} = {BB3788CB-A8A5-4236-B064-902D5775A118}
+		{A4876C75-38CB-4546-B3B8-0A0C59E377EE} = {BB3788CB-A8A5-4236-B064-902D5775A118}
+		{B555A005-4B42-4720-9351-E1B08FC65EE6} = {BB3788CB-A8A5-4236-B064-902D5775A118}
+		{484317E1-3A6A-4075-8089-9CF5F469873D} = {BB3788CB-A8A5-4236-B064-902D5775A118}
+		{BCC16FA0-0399-4FBC-96CF-622F9C887663} = {BB3788CB-A8A5-4236-B064-902D5775A118}
+		{496D3CAB-C792-42BA-8100-6CAA5E731171} = {BB3788CB-A8A5-4236-B064-902D5775A118}
+		{CF460616-9227-45FF-ABB1-A29AFCFFC980} = {BB3788CB-A8A5-4236-B064-902D5775A118}
+		{5F218EAD-A153-4A06-B59D-800F23895EF9} = {BB3788CB-A8A5-4236-B064-902D5775A118}
 	EndGlobalSection
 EndGlobal
