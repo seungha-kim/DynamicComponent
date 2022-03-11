@@ -1,5 +1,7 @@
 ﻿namespace FormulaAST
 
+open System.Collections.Generic
+
 type Expression =
     // Literal
     | NumberLiteral of string
@@ -10,8 +12,7 @@ type Expression =
     | MultiplyOperator of Expression * Expression
     
     // Function
-    | AbsFunction of Expression
-    | AddFunction of Expression * Expression // for test
+    | FunctionExpression of string * IEnumerable<Expression>
 
     // Misc
     | InvalidExpression of string

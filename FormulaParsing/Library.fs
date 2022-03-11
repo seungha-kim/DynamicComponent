@@ -21,7 +21,17 @@ module private impl =
     let fragParens p =
         between (fragStr "(") (fragStr ")") p .>> ws
 
-    let fragFuncName name = fragStrCI name |>> fun s -> s.ToUpper()
+    let isAsciiIdStart c = isAsciiLetter c || c = '_'
+
+    let isAsciiIdContinue c =
+        isAsciiLetter c
+        || isDigit c
+        || c = '_'
+        || c = '\''
+
+    let fragIdent =
+        identifier (IdentifierOptions(isAsciiIdStart = isAsciiIdStart, isAsciiIdContinue = isAsciiIdContinue)) .>> ws
+
     // Literals
     let numOpts =
         NumberLiteralOptions.AllowFraction
@@ -31,34 +41,14 @@ module private impl =
         numberLiteral numOpts "number" .>> ws
         |>> fun lit -> Expression.NumberLiteral lit.String
 
-    // Built-in functions
-    let getFunc1 name arg =
-        match name with
-        | "ABS" -> AbsFunction arg
-        | _ -> failwith "todo"
-
-    let getFunc2 name arg1 arg2 =
-        match name with
-        | "ADD" -> AddFunction(arg1, arg2)
-        | _ -> failwith "todo"
-
-    let fragFunc1 name =
-        pipe2 (fragFuncName name .>> fragStr "(") (fragExpr .>> fragStr ")") getFunc1
-
-    let fragFunc2 name =
-        pipe3 (fragFuncName name .>> fragStr "(") (fragExpr .>> fragStr ",") (fragExpr .>> fragStr ")") getFunc2
-
-    let fragAbsFunction = fragFunc1 "ABS"
-    let fragAddFunction = fragFunc2 "ADD"
-
-    let allFunctions =
-        choice [ fragAbsFunction
-                 fragAddFunction ]
-
+    // Functions
+    let fragFunc = pipe2 fragIdent (fragParens (sepBy fragExpr (fragStr ","))) (fun name args -> FunctionExpression(name, args))
+    
     // Operator precedence parser
 
     opp.TermParser <-
         fragNumber
+        <|> fragFunc
         <|> between (fragStr "(") (fragStr ")") fragExpr
 
     opp.AddOperator(InfixOperator("+", ws, 10, Associativity.Left, (fun x y -> AddOperator(x, y))))

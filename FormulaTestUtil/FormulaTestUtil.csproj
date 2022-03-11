@@ -4,12 +4,11 @@
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{B555A005-4B42-4720-9351-E1B08FC65EE6}</ProjectGuid>
-        <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+        <ProjectGuid>{5F218EAD-A153-4A06-B59D-800F23895EF9}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>FormulaEvaluatorTest</RootNamespace>
-        <AssemblyName>FormulaEvaluationTest</AssemblyName>
+        <RootNamespace>FormulaTestUtil</RootNamespace>
+        <AssemblyName>FormulaTestUtil</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
@@ -33,51 +32,20 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-          <HintPath>..\packages\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
-          <Private>True</Private>
-        </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
         <Reference Include="System.Xml" />
-        <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c">
-            <HintPath>..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
-        </Reference>
-        <Reference Include="xunit.assert, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c">
-            <HintPath>..\packages\xunit.assert.2.1.0\lib\dotnet\xunit.assert.dll</HintPath>
-        </Reference>
-        <Reference Include="xunit.core, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c">
-            <HintPath>..\packages\xunit.extensibility.core.2.1.0\lib\dotnet\xunit.core.dll</HintPath>
-        </Reference>
-        <Reference Include="xunit.execution.desktop, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c">
-            <HintPath>..\packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
-        </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Tests.cs" />
+        <Compile Include="DummyParsingContext.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\FormulaAST\FormulaAST.fsproj">
-        <Project>{b31ab31c-da1e-46be-8522-207ce9f45003}</Project>
-        <Name>FormulaAST</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\FormulaEvaluation\FormulaEvaluation.fsproj">
-        <Project>{a4876c75-38cb-4546-b3b8-0a0c59e377ee}</Project>
-        <Name>FormulaEvaluation</Name>
-      </ProjectReference>
       <ProjectReference Include="..\FormulaInterface\FormulaInterface.csproj">
         <Project>{484317e1-3a6a-4075-8089-9cf5f469873d}</Project>
         <Name>FormulaInterface</Name>
       </ProjectReference>
-      <ProjectReference Include="..\FormulaTestUtil\FormulaTestUtil.csproj">
-        <Project>{5f218ead-a153-4a06-b59d-800f23895ef9}</Project>
-        <Name>FormulaTestUtil</Name>
-      </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
-      <None Include="packages.config" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -87,4 +55,5 @@
     <Target Name="AfterBuild">
     </Target>
     -->
+
 </Project>

@@ -4,14 +4,16 @@
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{930B3BA8-82EF-44C0-873C-9A0457E81D33}</ProjectGuid>
+        <ProjectGuid>{CF460616-9227-45FF-ABB1-A29AFCFFC980}</ProjectGuid>
         <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>FormulaParserTest</RootNamespace>
-        <AssemblyName>FormulaParsingTest</AssemblyName>
+        <RootNamespace>FormulaTest</RootNamespace>
+        <AssemblyName>FormulaTest</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
+        <LangVersion>8</LangVersion>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,8 +35,8 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-          <HintPath>..\packages\FSharp.Core.6.0.3\lib\netstandard2.0\FSharp.Core.dll</HintPath>
+        <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+          <HintPath>..\packages\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
           <Private>True</Private>
         </Reference>
         <Reference Include="System" />
@@ -63,6 +65,10 @@
         <Project>{b31ab31c-da1e-46be-8522-207ce9f45003}</Project>
         <Name>FormulaAST</Name>
       </ProjectReference>
+      <ProjectReference Include="..\FormulaEvaluation\FormulaEvaluation.fsproj">
+        <Project>{a4876c75-38cb-4546-b3b8-0a0c59e377ee}</Project>
+        <Name>FormulaEvaluation</Name>
+      </ProjectReference>
       <ProjectReference Include="..\FormulaInterface\FormulaInterface.csproj">
         <Project>{484317e1-3a6a-4075-8089-9cf5f469873d}</Project>
         <Name>FormulaInterface</Name>
@@ -70,6 +76,10 @@
       <ProjectReference Include="..\FormulaParsing\FormulaParsing.fsproj">
         <Project>{bcc16fa0-0399-4fbc-96cf-622f9c887663}</Project>
         <Name>FormulaParsing</Name>
+      </ProjectReference>
+      <ProjectReference Include="..\FormulaTestUtil\FormulaTestUtil.csproj">
+        <Project>{5f218ead-a153-4a06-b59d-800f23895ef9}</Project>
+        <Name>FormulaTestUtil</Name>
       </ProjectReference>
     </ItemGroup>
     <ItemGroup>
