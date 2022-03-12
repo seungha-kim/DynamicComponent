@@ -51,6 +51,10 @@
         <Project>{b31ab31c-da1e-46be-8522-207ce9f45003}</Project>
         <Name>Formula.AST</Name>
       </ProjectReference>
+      <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj">
+        <Project>{1f366fa6-2af2-40a2-b51e-ad0fe451707c}</Project>
+        <Name>Formula.ValueRepresentation</Name>
+      </ProjectReference>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

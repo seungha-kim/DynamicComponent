@@ -49,7 +49,7 @@ namespace ObservableTable.Engine
             UpdateDependentProperties();
         }
 
-        public Table GetTableById(TableId id)
+        public Table? GetTableById(TableId id)
         {
             return Tables.TryGetValue(id, out var table) ? table : null;
         }

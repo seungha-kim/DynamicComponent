@@ -30,6 +30,7 @@
       <ProjectReference Include="..\Formula.Evaluation\Formula.Evaluation.fsproj" />
       <ProjectReference Include="..\Formula.Interface\Formula.Interface.csproj" />
       <ProjectReference Include="..\Formula.TestUtil\Formula.TestUtil.csproj" />
+      <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj" />
     </ItemGroup>
 
 </Project>

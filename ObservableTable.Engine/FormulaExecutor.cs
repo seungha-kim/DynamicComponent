@@ -25,9 +25,8 @@ namespace ObservableTable.Engine
             }
 
             var expr = script.ExpressionCache[propertyName];
-            // TODO: 정해져있는 타입이 있으면 해당 타입으로 평가하기. 간단한 타입추론을 하거나, 동적 타입시스템으로 바꿔야 할 수도 (값이 타입을 갖게 만들기)
-            var result = Evaluator.EvaluateAsNumber(_evaluationContext, expr);
-            table.UpdateNumberProperty(propertyName, result);
+            var result = Evaluator.Evaluate(_evaluationContext, expr);
+            table.UpdateProperty(propertyName, result);
         }
 
         private class ParsingContext : IParsingContext

@@ -1,32 +1,24 @@
-﻿namespace ObservableTable.Engine
+﻿using Formula.ValueRepresentation;
+
+namespace ObservableTable.Engine
 {
     public class Table
     {
-        public delegate void PropertyUpdateDelegate(Table sender, string propertyName);
+        public delegate void PropertyUpdateDelegate(Table sender, string propertyName, FormulaValue value);
         public event PropertyUpdateDelegate OnPropertyUpdate = delegate {  };
         public TableId ID { get; }
         public bool HasCopy { get; }
-        public float GetNumberProperty(string name)
+        public FormulaValue GetProperty(string name)
         {
             throw new System.NotImplementedException();
         }
 
-        public string GetTextProperty(string name)
+        public FormulaValue GetPropertyOfCopy(string name, int index)
         {
             throw new System.NotImplementedException();
         }
 
-        public float GetNumberPropertyOfCopy(string name, int index)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        internal void UpdateNumberProperty(string name, float value)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        internal void UpdateTextProperty(string name, string value)
+        internal void UpdateProperty(string name, FormulaValue value)
         {
             throw new System.NotImplementedException();
         }

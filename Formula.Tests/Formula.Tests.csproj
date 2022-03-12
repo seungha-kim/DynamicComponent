@@ -81,6 +81,10 @@
         <Project>{5f218ead-a153-4a06-b59d-800f23895ef9}</Project>
         <Name>Formula.TestUtil</Name>
       </ProjectReference>
+      <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj">
+        <Project>{1f366fa6-2af2-40a2-b51e-ad0fe451707c}</Project>
+        <Name>Formula.ValueRepresentation</Name>
+      </ProjectReference>
     </ItemGroup>
     <ItemGroup>
       <None Include="App.config" />

@@ -1,11 +1,11 @@
 ﻿module Formula.Evaluation
 
 open System
-open System.Collections
 open System.Collections.Generic
 open System.Linq
 open Formula.AST
 open Formula.Interface
+open Formula.ValueRepresentation
 
 module private argUtils =
     let get1 (e: IEnumerable<Expression>) =
@@ -23,31 +23,49 @@ module private funcs =
     let add (x: float32) (y: float32) : float32 = x + y
 
 module private impl =
-    let rec private evaluateAsNumber ctx expr =
-        match expr with
-        | NumberLit s -> Convert.ToSingle(s)
-        | NegateOp operand -> (evaluateAsNumber ctx operand) * -1.0f 
-        | AddOp (lhs, rhs) ->
-            (evaluateAsNumber ctx lhs)
-            + (evaluateAsNumber ctx rhs)
-        | SubtractOp(lhs, rhs) ->
-            (evaluateAsNumber ctx lhs)
-            - (evaluateAsNumber ctx rhs)
-        | MultiplyOp (lhs, rhs) ->
-            (evaluateAsNumber ctx lhs)
-            * (evaluateAsNumber ctx rhs)
-        | FunctionExpr (name, args) -> evaluateFunctionAsNumber ctx name args
-        | InvalidExpr _ -> 0.0f
+    let asFloat (value: FormulaValue) : float32 =
+        match value with
+        | NumberValue f -> f
+        | _ -> raise (ArgumentException("Cannot evaluate as number"))
 
-    and evaluateFunctionAsNumber ctx name args =
+    let rec private evaluate ctx expr =
+        match expr with
+        | NumberLit s -> Convert.ToSingle(s) |> NumberValue
+        | NegateOp operand ->
+            (evaluate ctx operand |> asFloat) * -1.0f
+            |> NumberValue
+        | AddOp (lhs, rhs) ->
+            (evaluate ctx lhs |> asFloat)
+            + (evaluate ctx rhs |> asFloat)
+            |> NumberValue
+        | SubtractOp (lhs, rhs) ->
+            NumberValue(
+                (evaluate ctx lhs |> asFloat)
+                - (evaluate ctx rhs |> asFloat)
+            )
+        | MultiplyOp (lhs, rhs) ->
+            (evaluate ctx lhs |> asFloat)
+            * (evaluate ctx rhs |> asFloat)
+            |> NumberValue
+        | FunctionExpr (name, args) -> evaluateFunction ctx name args
+        | InvalidExpr _ -> 0.0f |> NumberValue
+
+    and evaluateFunction ctx name args =
         match name.ToUpper() with
         | "ABS" ->
             let arg = argUtils.get1 args
-            funcs.abs (evaluateAsNumber ctx arg)
+
+            evaluate ctx arg
+            |> asFloat
+            |> funcs.abs
+            |> NumberValue
         | "ADD" ->
             let arg1, arg2 = argUtils.get2 args
-            funcs.add (evaluateAsNumber ctx arg1) (evaluateAsNumber ctx arg2)
-        | _ -> 0.0f // TODO: throw?
+
+            (evaluate ctx arg1 |> asFloat, evaluate ctx arg2 |> asFloat)
+            ||> funcs.add
+            |> NumberValue
+        | _ -> raise (ArgumentException("Invalid function name"))
 
     let rec private evaluateAsVoid ctx expr =
         match expr with
@@ -55,9 +73,7 @@ module private impl =
 
     type FormulaEvaluator() =
         interface IFormulaEvaluator with
-            member this.EvaluateAsNumber(ctx, expr) = evaluateAsNumber ctx expr
-
-            member this.EvaluateAsVoid(ctx, expr) = evaluateAsVoid ctx expr
+            member this.Evaluate(ctx, expr) = evaluate ctx expr
 
 let createEvaluator () =
     impl.FormulaEvaluator() :> IFormulaEvaluator

@@ -5,10 +5,10 @@
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{A4876C75-38CB-4546-B3B8-0A0C59E377EE}</ProjectGuid>
+        <ProjectGuid>{1F366FA6-2AF2-40A2-B51E-AD0FE451707C}</ProjectGuid>
         <OutputType>Library</OutputType>
-        <RootNamespace>FormulaEvaluator</RootNamespace>
-        <AssemblyName>Formula.Evaluation</AssemblyName>
+        <RootNamespace>Formula.Value</RootNamespace>
+        <AssemblyName>Formula.ValueRepresentation</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     </PropertyGroup>
@@ -45,20 +45,6 @@
         <Compile Include="Library.fs" />
         <None Include="Script.fsx" />
         <Content Include="packages.config" />
-    </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\Formula.AST\Formula.AST.fsproj">
-        <Project>{b31ab31c-da1e-46be-8522-207ce9f45003}</Project>
-        <Name>Formula.AST</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Formula.Interface\Formula.Interface.csproj">
-        <Project>{484317e1-3a6a-4075-8089-9cf5f469873d}</Project>
-        <Name>Formula.Interface</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj">
-        <Project>{1f366fa6-2af2-40a2-b51e-ad0fe451707c}</Project>
-        <Name>Formula.ValueRepresentation</Name>
-      </ProjectReference>
     </ItemGroup>
     <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
 </Project>
