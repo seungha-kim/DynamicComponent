@@ -5,7 +5,6 @@
 
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
-        <RootNamespace>FormulaParsingTest</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

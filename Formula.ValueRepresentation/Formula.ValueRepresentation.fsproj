@@ -7,7 +7,7 @@
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
         <ProjectGuid>{1F366FA6-2AF2-40A2-B51E-AD0FE451707C}</ProjectGuid>
         <OutputType>Library</OutputType>
-        <RootNamespace>Formula.Value</RootNamespace>
+        <RootNamespace>Formula.ValueRepresentation</RootNamespace>
         <AssemblyName>Formula.ValueRepresentation</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
