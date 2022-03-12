@@ -7,15 +7,30 @@ open Formula.AST
 open Formula.Interface
 open Formula.ValueRepresentation
 
+module Exceptions =
+    // TODO: more info
+    exception UnexpectedTypeError
+    exception UnexpectedFunctionNameError
+    exception InvalidExpressionError
+    exception WrongArgumentNumberError
+
 module private argUtils =
+    open Exceptions
+
     let get1 (e: IEnumerable<Expression>) =
         let l = Enumerable.ToList(e)
-        // todo: assertion and return error
+
+        if l.Count <> 1 then
+            raise WrongArgumentNumberError
+
         e.ElementAt(0)
 
     let get2 (e: IEnumerable<Expression>) =
         let l = Enumerable.ToList(e)
-        // todo: assertion and return error
+
+        if l.Count <> 2 then
+            raise WrongArgumentNumberError
+
         (e.ElementAt(0), e.ElementAt(1))
 
 module private funcs =
@@ -23,10 +38,12 @@ module private funcs =
     let add (x: float32) (y: float32) : float32 = x + y
 
 module private impl =
+    open Exceptions
+
     let asFloat (value: FormulaValue) : float32 =
         match value with
         | NumberValue f -> f
-        | _ -> raise (ArgumentException("Cannot evaluate as number"))
+        | _ -> raise UnexpectedTypeError
 
     let rec private evaluate ctx expr =
         match expr with
@@ -48,7 +65,7 @@ module private impl =
             * (evaluate ctx rhs |> asFloat)
             |> NumberValue
         | FunctionExpr (name, args) -> evaluateFunction ctx name args
-        | InvalidExpr _ -> 0.0f |> NumberValue
+        | InvalidExpr _ -> raise InvalidExpressionError
 
     and evaluateFunction ctx name args =
         match name.ToUpper() with
@@ -65,11 +82,7 @@ module private impl =
             (evaluate ctx arg1 |> asFloat, evaluate ctx arg2 |> asFloat)
             ||> funcs.add
             |> NumberValue
-        | _ -> raise (ArgumentException("Invalid function name"))
-
-    let rec private evaluateAsVoid ctx expr =
-        match expr with
-        | _ -> ()
+        | _ -> raise UnexpectedFunctionNameError
 
     type FormulaEvaluator() =
         interface IFormulaEvaluator with
