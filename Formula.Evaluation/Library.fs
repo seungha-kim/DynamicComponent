@@ -6,87 +6,90 @@ open System.Linq
 open Formula.AST
 open Formula.Interface
 open Formula.ValueRepresentation
-
-module Exceptions =
-    // TODO: more info
-    exception UnexpectedTypeError
-    exception UnexpectedFunctionNameError
-    exception InvalidExpressionError
-    exception WrongArgumentNumberError
+open Formula.Errors
 
 module private argUtils =
-    open Exceptions
 
     let get1 (e: IEnumerable<Expression>) =
         let l = Enumerable.ToList(e)
 
         if l.Count <> 1 then
-            raise WrongArgumentNumberError
-
-        e.ElementAt(0)
+            WrongArgumentNumber |> Error
+        else
+            e.ElementAt(0) |> Ok
 
     let get2 (e: IEnumerable<Expression>) =
         let l = Enumerable.ToList(e)
 
         if l.Count <> 2 then
-            raise WrongArgumentNumberError
-
-        (e.ElementAt(0), e.ElementAt(1))
+            WrongArgumentNumber |> Error
+        else
+            (e.ElementAt(0), e.ElementAt(1)) |> Ok
 
 module private funcs =
     let abs (x: float32) : float32 = Math.Abs(x)
     let add (x: float32) (y: float32) : float32 = x + y
 
 module private impl =
-    open Exceptions
+    type ResultBuilder() =
+        member this.Bind(m, f) = Result.bind f m
+        member this.Return(x) = Ok x
 
-    let asFloat (value: FormulaValue) : float32 =
-        match value with
-        | NumberValue f -> f
-        | _ -> raise UnexpectedTypeError
+    let result = ResultBuilder()
 
-    let rec private evaluate ctx expr =
+    let rec private evaluate
+        (ctx: IEvaluationContext)
+        (expr: Expression)
+        : Result<FormulaValue, Formula.Errors.Errors> =
         match expr with
-        | NumberLit s -> Convert.ToSingle(s) |> NumberValue
+        | NumberLit s -> Convert.ToSingle(s) |> NumberValue |> Ok
         | NegateOp operand ->
-            (evaluate ctx operand |> asFloat) * -1.0f
-            |> NumberValue
-        | AddOp (lhs, rhs) ->
-            (evaluate ctx lhs |> asFloat)
-            + (evaluate ctx rhs |> asFloat)
-            |> NumberValue
-        | SubtractOp (lhs, rhs) ->
-            NumberValue(
-                (evaluate ctx lhs |> asFloat)
-                - (evaluate ctx rhs |> asFloat)
-            )
-        | MultiplyOp (lhs, rhs) ->
-            (evaluate ctx lhs |> asFloat)
-            * (evaluate ctx rhs |> asFloat)
-            |> NumberValue
+            result {
+                let! x = (evaluate ctx operand)
+                let! f = x.asFloat
+                return NumberValue f
+            }
+        | AddOp (lhs, rhs) -> simpleFloatBinaryOp ctx lhs rhs (+)
+        | SubtractOp (lhs, rhs) -> simpleFloatBinaryOp ctx lhs rhs (-)
+        | MultiplyOp (lhs, rhs) -> simpleFloatBinaryOp ctx lhs rhs (*)
         | FunctionExpr (name, args) -> evaluateFunction ctx name args
-        | InvalidExpr _ -> raise InvalidExpressionError
+        | InvalidExpr _ -> InvalidExpression |> Error
 
     and evaluateFunction ctx name args =
         match name.ToUpper() with
         | "ABS" ->
-            let arg = argUtils.get1 args
-
-            evaluate ctx arg
-            |> asFloat
-            |> funcs.abs
-            |> NumberValue
+            result {
+                let! arg = argUtils.get1 args
+                let! v = evaluate ctx arg
+                let! f = v.asFloat
+                return f |> funcs.abs |> NumberValue
+            }
         | "ADD" ->
-            let arg1, arg2 = argUtils.get2 args
+            result {
+                let! arg1, arg2 = argUtils.get2 args
+                let! v1 = evaluate ctx arg1
+                let! f1 = v1.asFloat
+                let! v2 = evaluate ctx arg2
+                let! f2 = v2.asFloat
+                return funcs.add f1 f2 |> NumberValue
+            }
+        | _ -> Error UnexpectedFunctionName
 
-            (evaluate ctx arg1 |> asFloat, evaluate ctx arg2 |> asFloat)
-            ||> funcs.add
-            |> NumberValue
-        | _ -> raise UnexpectedFunctionNameError
+    and simpleFloatBinaryOp ctx lhs rhs op =
+        result {
+            let! lv = evaluate ctx lhs
+            let! lf = lv.asFloat
+            let! rv = evaluate ctx rhs
+            let! rf = rv.asFloat
+            return op lf rf |> NumberValue
+        }
 
     type FormulaEvaluator() =
         interface IFormulaEvaluator with
-            member this.Evaluate(ctx, expr) = evaluate ctx expr
+            member this.Evaluate(ctx, expr) =
+                match (evaluate ctx expr) with
+                | Ok v -> v
+                | Error e -> raise (Exception("error:" + e.ToString()))
 
 let createEvaluator () =
     impl.FormulaEvaluator() :> IFormulaEvaluator

@@ -51,6 +51,10 @@
         <Project>{b31ab31c-da1e-46be-8522-207ce9f45003}</Project>
         <Name>Formula.AST</Name>
       </ProjectReference>
+      <ProjectReference Include="..\Formula.Errors\Formula.Errors.fsproj">
+        <Project>{e49b338c-d233-41a2-9da4-3d751d751a1c}</Project>
+        <Name>Formula.Errors</Name>
+      </ProjectReference>
       <ProjectReference Include="..\Formula.Interface\Formula.Interface.csproj">
         <Project>{484317e1-3a6a-4075-8089-9cf5f469873d}</Project>
         <Name>Formula.Interface</Name>
