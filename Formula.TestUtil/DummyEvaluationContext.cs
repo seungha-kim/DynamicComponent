@@ -5,12 +5,12 @@ namespace Formula.TestUtil
 {
     public class DummyEvaluationContext : IEvaluationContext
     {
-        public FormulaValue LookupIdentifier(string name)
+        public FormulaValue GetIdentifierValue(string name)
         {
             return FormulaValue.NullValue;
         }
 
-        public FormulaValue LookupProperty(string receiver, string name)
+        public FormulaValue GetPropertyValue(string receiver, string name)
         {
             return FormulaValue.NullValue;
         }

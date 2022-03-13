@@ -1,17 +1,22 @@
-﻿using System.Collections.Generic;
-using Formula.AST;
-using Formula.Interface;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ObservableTable.Engine
 {
     public class TableScript
     {
-        public delegate void ScriptUpdateDelegate(TableScript sender, string propertyName);
-
         public delegate void ParentUpdateDelegate(TableScript sender);
 
-        public event ScriptUpdateDelegate OnPropertyFormulaUpdate = delegate { };
-        public event ParentUpdateDelegate OnParentUpdate = delegate { };
+        public delegate void ScriptUpdateDelegate(TableScript sender, string propertyName);
+
+        private TableScript? _parent;
+
+        internal TableScript(TableId id, string name)
+        {
+            ID = id;
+            Name = name;
+        }
+
         public TableId ID { get; }
         public string Name { get; }
 
@@ -20,28 +25,27 @@ namespace ObservableTable.Engine
             get => _parent;
             set
             {
+                if (value == this) throw new Exception("TODO: Cannot be parent of self");
                 _parent = value;
                 OnParentUpdate.Invoke(this);
             }
         }
 
-        internal Dictionary<string, Expression> ExpressionCache { get; } =
-            new Dictionary<string, Expression>();
-
-        private TableScript? _parent;
         private Dictionary<string, string> Formulas { get; } = new Dictionary<string, string>();
-        private IFormulaParser Parser { get; }
 
-        public TableScript(TableId id, string name, IFormulaParser parser)
-        {
-            ID = id;
-            Name = name;
-            Parser = parser;
-        }
+        public event ScriptUpdateDelegate OnPropertyFormulaUpdate = delegate { };
+
+        // TODO: 이 때 dependency 완전 다시 계산해야겠는데..
+        public event ParentUpdateDelegate OnParentUpdate = delegate { };
 
         public IEnumerable<string> GetPropertyNames()
         {
             return Formulas.Keys;
+        }
+
+        public bool HasProperty(string name)
+        {
+            return Formulas.ContainsKey(name);
         }
 
         public string? GetPropertyFormula(string name)
@@ -52,14 +56,13 @@ namespace ObservableTable.Engine
         public void UpdatePropertyFormula(string name, string formula)
         {
             Formulas[name] = formula;
-            ExpressionCache.Remove(name);
             OnPropertyFormulaUpdate.Invoke(this, name);
         }
 
         public void RemovePropertyFormula(string name)
         {
             Formulas.Remove(name);
-            ExpressionCache.Remove(name);
+            OnPropertyFormulaUpdate.Invoke(this, name);
         }
     }
 }

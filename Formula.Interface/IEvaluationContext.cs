@@ -4,7 +4,7 @@ namespace Formula.Interface
 {
     public interface IEvaluationContext
     {
-        FormulaValue LookupIdentifier(string name);
-        FormulaValue LookupProperty(string receiver, string name);
+        FormulaValue GetIdentifierValue(string name);
+        FormulaValue GetPropertyValue(string receiver, string name);
     }
 }

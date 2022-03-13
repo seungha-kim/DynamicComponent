@@ -40,12 +40,16 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="DependencyManager.cs" />
+        <Compile Include="RelationManager.cs" />
         <Compile Include="FormulaExecutor.cs" />
-        <Compile Include="ITableRepository.cs" />
+        <Compile Include="IRelationReadable.cs" />
+        <Compile Include="ITableRuntimeReadable.cs" />
+        <Compile Include="ITableScriptReadable.cs" />
         <Compile Include="PropertyDescriptor.cs" />
-        <Compile Include="Table.cs" />
         <Compile Include="TableEngine.cs" />
+        <Compile Include="TableRuntime.cs" />
+        <Compile Include="TableRuntimeManager.cs" />
+        <Compile Include="TableScriptManager.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="TableId.cs" />
         <Compile Include="TableScript.cs" />
