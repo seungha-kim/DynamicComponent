@@ -4,6 +4,8 @@ open FParsec
 
 let __section (str: string) = printfn "\n***** SECTION: %s *****" str
 
+let aaas = dict [(1, 2)]
+
 let test p str =
     match run p str with
     | Success (result, _, _) -> printfn "Success: %A" result

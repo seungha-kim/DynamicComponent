@@ -47,6 +47,10 @@
         <Project>{484317e1-3a6a-4075-8089-9cf5f469873d}</Project>
         <Name>Formula.Interface</Name>
       </ProjectReference>
+      <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj">
+        <Project>{1f366fa6-2af2-40a2-b51e-ad0fe451707c}</Project>
+        <Name>Formula.ValueRepresentation</Name>
+      </ProjectReference>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

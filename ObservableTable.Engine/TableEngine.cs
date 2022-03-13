@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace ObservableTable.Engine
 {
-    public class TableEngine
+    public class TableEngine : ITableRepository
     {
         private Dictionary<TableId, TableScript> Scripts { get; } = new Dictionary<TableId, TableScript>();
         private Dictionary<TableId, Table> Tables { get; } = new Dictionary<TableId, Table>();
@@ -13,7 +13,12 @@ namespace ObservableTable.Engine
         private Queue<PropertyDescriptor> ScriptPropertyUpdateQueue { get; } = new Queue<PropertyDescriptor>();
         private Queue<PropertyDescriptor> TablePropertyUpdateQueue { get; } = new Queue<PropertyDescriptor>();
         private Stack<PropertyDescriptor> PropertyDfs { get; } = new Stack<PropertyDescriptor>();
-        private FormulaExecutor Executor { get; } = new FormulaExecutor();
+        private FormulaExecutor Executor { get; }
+
+        public TableEngine()
+        {
+            Executor = new FormulaExecutor(this);
+        }
 
         public void AddTableScript(TableScript script)
         {
@@ -52,6 +57,29 @@ namespace ObservableTable.Engine
         public Table? GetTableById(TableId id)
         {
             return Tables.TryGetValue(id, out var table) ? table : null;
+        }
+
+        public Table? GetParent(TableId id)
+        {
+            Scripts.TryGetValue(id, out var script);
+
+            var parentScript = script?.Parent;
+            if (parentScript is null) return null;
+
+            Tables.TryGetValue(parentScript.ID, out var parent);
+            return parent;
+        }
+
+        public IEnumerable<Table> GetChildrenById(TableId id)
+        {
+            Tables.TryGetValue(id, out var parent);
+
+            if (parent is null) yield break;
+
+            foreach (var pair in Scripts.Where(pair => pair.Value.Parent?.ID == id))
+            {
+                yield return Tables[pair.Key];
+            }
         }
 
         private void UpdateProperty(in PropertyDescriptor desc)

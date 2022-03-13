@@ -42,6 +42,7 @@
     <ItemGroup>
         <Compile Include="DependencyManager.cs" />
         <Compile Include="FormulaExecutor.cs" />
+        <Compile Include="ITableRepository.cs" />
         <Compile Include="PropertyDescriptor.cs" />
         <Compile Include="Table.cs" />
         <Compile Include="TableEngine.cs" />
