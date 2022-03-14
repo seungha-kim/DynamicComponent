@@ -5,9 +5,9 @@ namespace ObservableTable.Engine
 {
     public class TableScript
     {
-        public delegate void ParentUpdateDelegate(TableScript sender);
+        public delegate void ParentUpdateDelegate(TableScript sender, TableId? oldParent, TableId? newParent);
 
-        public delegate void ScriptUpdateDelegate(TableScript sender, string propertyName);
+        public delegate void PropertyInvalidateDelegate(TableScript sender, string propertyName);
 
         private TableScript? _parent;
 
@@ -26,14 +26,16 @@ namespace ObservableTable.Engine
             set
             {
                 if (value == this) throw new Exception("TODO: Cannot be parent of self");
+                var oldParent = _parent;
                 _parent = value;
-                OnParentUpdate.Invoke(this);
+                OnParentUpdate.Invoke(this, oldParent?.ID, _parent?.ID);
             }
         }
 
         private Dictionary<string, string> Formulas { get; } = new Dictionary<string, string>();
 
-        public event ScriptUpdateDelegate OnPropertyFormulaUpdate = delegate { };
+        public event PropertyInvalidateDelegate OnPropertyFormulaUpdate = delegate { };
+        public event PropertyInvalidateDelegate OnPropertyFormulaRemoved = delegate { };
 
         // TODO: 이 때 dependency 완전 다시 계산해야겠는데..
         public event ParentUpdateDelegate OnParentUpdate = delegate { };
@@ -62,7 +64,7 @@ namespace ObservableTable.Engine
         public void RemovePropertyFormula(string name)
         {
             Formulas.Remove(name);
-            OnPropertyFormulaUpdate.Invoke(this, name);
+            OnPropertyFormulaRemoved.Invoke(this, name);
         }
     }
 }

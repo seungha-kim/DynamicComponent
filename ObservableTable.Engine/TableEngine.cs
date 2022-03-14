@@ -2,18 +2,34 @@
 {
     public class TableEngine
     {
-        private readonly RelationManager _relationManager;
-        private readonly TableRuntimeManager _runtimeManager;
-        private readonly TableScriptManager _scriptManager;
+        private readonly TableRuntimeRepository _runtimeRepository;
+        private readonly TableScriptRepository _scriptRepository;
+        private readonly TableAnalyzer _tableAnalyzer;
+        private readonly TableRunner _tableRunner;
 
         public TableEngine()
         {
-            _relationManager = new RelationManager();
-            _scriptManager = new TableScriptManager(_relationManager);
-            _runtimeManager = new TableRuntimeManager(_scriptManager, _relationManager);
+            _scriptRepository = new TableScriptRepository();
+            _tableAnalyzer = new TableAnalyzer();
+            _runtimeRepository = new TableRuntimeRepository(_scriptRepository, _tableAnalyzer);
+            _tableRunner = new TableRunner();
 
-            _scriptManager.OnTableInvalidated += id => _runtimeManager.InvalidateTable(id);
-            _scriptManager.OnPropertyInvalidated += desc => _runtimeManager.InvalidateProperty(desc);
+            _scriptRepository.OnTableCreated += id => { _runtimeRepository.InvalidateTable(id); };
+            _scriptRepository.OnTableRemoved += id => { _tableAnalyzer.RemoveTable(id); };
+            _scriptRepository.OnParentUpdate += (id, parent, newParent) =>
+            {
+                // TODO
+            };
+            _scriptRepository.OnPropertyUpdated += desc =>
+            {
+                _tableAnalyzer.UpdateProperty(desc);
+                _runtimeRepository.UpdateProperty(desc);
+            };
+            _scriptRepository.OnPropertyRemoved += desc =>
+            {
+                _tableAnalyzer.RemoveProperty(desc);
+                _runtimeRepository.RemoveProperty(desc);
+            };
         }
     }
 }

@@ -4,7 +4,7 @@ open FParsec
 
 let __section (str: string) = printfn "\n***** SECTION: %s *****" str
 
-let aaas = dict [(1, 2)]
+let aaas = dict [ (1, 2) ]
 
 let test p str =
     match run p str with
@@ -15,7 +15,8 @@ let between pBegin pEnd p = pBegin >>. p .>> pEnd
 let betweenString s1 s2 p = between (pstring s1) (pstring s2) p
 
 type ASDF =
-    { name: string; age: int }
+    { name: string
+      age: int }
     member private this.HelloPrivate = printfn "Hello %s" this.name
     member this.Hello = this.HelloPrivate
 
@@ -29,27 +30,38 @@ type Choices =
         | Choice2 -> printfn "Choice2"
 
 module OPP =
-    let ws  = spaces  // whitespace parser
+    let ws = spaces // whitespace parser
+
     type Expr =
-          | InfixOpExpr of string * Expr * Expr
-          | Number of int
+        | InfixOpExpr of string * Expr * Expr
+        | Number of int
 
     let isSymbolicOperatorChar = isAnyOf "!%&*+-./<=>@^|~?"
-    let remainingOpChars_ws = manySatisfy isSymbolicOperatorChar .>> ws
 
-    let opp = new OperatorPrecedenceParser<Expr, string, unit>()
+    let remainingOpChars_ws =
+        manySatisfy isSymbolicOperatorChar .>> ws
+
+    let opp =
+        new OperatorPrecedenceParser<Expr, string, unit>()
+
     opp.TermParser <- pint32 .>> ws |>> Number
 
     // a helper function for adding infix operators to opp
     let addSymbolicInfixOperators prefix precedence associativity =
-        let op = InfixOperator(prefix, remainingOpChars_ws,
-                               precedence, associativity, (),
-                               fun remOpChars expr1 expr2 ->
-                                   InfixOpExpr(prefix + remOpChars, expr1, expr2))
+        let op =
+            InfixOperator(
+                prefix,
+                remainingOpChars_ws,
+                precedence,
+                associativity,
+                (),
+                fun remOpChars expr1 expr2 -> InfixOpExpr(prefix + remOpChars, expr1, expr2)
+            )
+
         opp.AddOperator(op)
 
     // the operator definitions:
-    addSymbolicInfixOperators "*"  10 Associativity.Left
+    addSymbolicInfixOperators "*" 10 Associativity.Left
     addSymbolicInfixOperators "**" 20 Associativity.Right
 
 [<EntryPoint>]
@@ -161,6 +173,5 @@ let main argv =
 
     __section "OPP"
     test OPP.opp.ExpressionParser "1*!!!!!!!!!2*.3**4**.5"
-    
-    0
 
+    0

@@ -40,44 +40,45 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="RelationManager.cs" />
+        <Compile Include="TableAnalyzer.cs" />
         <Compile Include="FormulaExecutor.cs" />
         <Compile Include="IRelationReadable.cs" />
         <Compile Include="ITableRuntimeReadable.cs" />
         <Compile Include="ITableScriptReadable.cs" />
         <Compile Include="PropertyDescriptor.cs" />
         <Compile Include="TableEngine.cs" />
+        <Compile Include="TableRunner.cs" />
         <Compile Include="TableRuntime.cs" />
-        <Compile Include="TableRuntimeManager.cs" />
-        <Compile Include="TableScriptManager.cs" />
+        <Compile Include="TableRuntimeRepository.cs" />
+        <Compile Include="TableScriptRepository.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="TableId.cs" />
         <Compile Include="TableScript.cs" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\Formula.AST\Formula.AST.fsproj">
-        <Project>{b31ab31c-da1e-46be-8522-207ce9f45003}</Project>
-        <Name>Formula.AST</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Formula.Evaluation\Formula.Evaluation.fsproj">
-        <Project>{a4876c75-38cb-4546-b3b8-0a0c59e377ee}</Project>
-        <Name>Formula.Evaluation</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Formula.Interface\Formula.Interface.csproj">
-        <Project>{484317e1-3a6a-4075-8089-9cf5f469873d}</Project>
-        <Name>Formula.Interface</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Formula.Parsing\Formula.Parsing.fsproj">
-        <Project>{bcc16fa0-0399-4fbc-96cf-622f9c887663}</Project>
-        <Name>Formula.Parsing</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj">
-        <Project>{1f366fa6-2af2-40a2-b51e-ad0fe451707c}</Project>
-        <Name>Formula.ValueRepresentation</Name>
-      </ProjectReference>
+        <ProjectReference Include="..\Formula.AST\Formula.AST.fsproj">
+            <Project>{b31ab31c-da1e-46be-8522-207ce9f45003}</Project>
+            <Name>Formula.AST</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\Formula.Evaluation\Formula.Evaluation.fsproj">
+            <Project>{a4876c75-38cb-4546-b3b8-0a0c59e377ee}</Project>
+            <Name>Formula.Evaluation</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\Formula.Interface\Formula.Interface.csproj">
+            <Project>{484317e1-3a6a-4075-8089-9cf5f469873d}</Project>
+            <Name>Formula.Interface</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\Formula.Parsing\Formula.Parsing.fsproj">
+            <Project>{bcc16fa0-0399-4fbc-96cf-622f9c887663}</Project>
+            <Name>Formula.Parsing</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj">
+            <Project>{1f366fa6-2af2-40a2-b51e-ad0fe451707c}</Project>
+            <Name>Formula.ValueRepresentation</Name>
+        </ProjectReference>
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="obj" />
+        <Folder Include="obj" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

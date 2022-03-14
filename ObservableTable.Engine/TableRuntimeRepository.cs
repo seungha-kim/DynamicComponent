@@ -1,69 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Formula;
 using Formula.AST;
 using Formula.Interface;
 using Formula.ValueRepresentation;
 
 namespace ObservableTable.Engine
 {
-    internal class TableRuntimeManager: ITableRuntimeReadable
+    internal class TableRuntimeRepository : ITableRuntimeReadable
     {
-        private readonly Dictionary<TableId, TableRuntime> _tables;
+        private readonly IFormulaEvaluator _evaluator;
+
+        private readonly HashSet<PropertyDescriptor> _invalidatingProperties;
+        private readonly HashSet<TableId> _invalidatingTables;
         private readonly Stack<PropertyDescriptor> _propertyDfs;
         private readonly IRelationReadable _relationReadable;
         private readonly ITableScriptReadable _scriptReadable;
-        private readonly IFormulaEvaluator _evaluator;
-        
-        private readonly HashSet<PropertyDescriptor> _invalidatingProperties;
-        private readonly HashSet<TableId> _invalidatingTables;
+        private readonly Dictionary<TableId, TableRuntime> _tables;
 
-        internal TableRuntimeManager(ITableScriptReadable scriptManager, IRelationReadable relationReadable)
+        internal TableRuntimeRepository(ITableScriptReadable scriptManager, IRelationReadable relationReadable)
         {
             _relationReadable = relationReadable;
             _tables = new Dictionary<TableId, TableRuntime>();
             _propertyDfs = new Stack<PropertyDescriptor>();
-            _evaluator = Formula.Evaluation.createEvaluator();
+            _evaluator = Evaluation.createEvaluator();
             _invalidatingProperties = new HashSet<PropertyDescriptor>();
             _invalidatingTables = new HashSet<TableId>();
-        }
-
-        internal void InvalidateTable(TableId id)
-        {
-            if (!_tables.ContainsKey(id))
-            {
-                _tables[id] = new TableRuntime();
-            }
-            else if (_tables.ContainsKey(id) && _scriptReadable.GetTableScript(id) is null)
-            {
-                _tables.Remove(id);
-            }
-        }
-
-        internal void InvalidateProperty(PropertyDescriptor desc)
-        {
-            _invalidatingProperties.Add(desc);
-        }
-
-        internal void Run()
-        {
-            // TODO: 순환참조 알림
-            // TODO: parent update 때 일단 전체 의존성 재계산
-            if (_relationReadable.IsCyclic) return;
-            InvalidatePropertiesByAnimation();
-            UpdateProperties();
-            PostRun();
-        }
-
-        private void InvalidatePropertiesByAnimation()
-        {
-            // TODO
-        }
-
-        private void PostRun()
-        {
-            _invalidatingTables.Clear();
-            _invalidatingProperties.Clear();
         }
 
         public TableRuntime? GetTableById(TableId id)
@@ -87,6 +50,45 @@ namespace ObservableTable.Engine
             return _scriptReadable.GetChildren(id).Select(script => _tables[script.ID]!);
         }
 
+        internal void InvalidateTable(TableId id)
+        {
+            if (!_tables.ContainsKey(id))
+                _tables[id] = new TableRuntime();
+            else if (_tables.ContainsKey(id) && _scriptReadable.GetTableScript(id) is null) _tables.Remove(id);
+        }
+
+        internal void UpdateProperty(PropertyDescriptor desc)
+        {
+            _invalidatingProperties.Add(desc);
+        }
+
+        internal void RemoveProperty(PropertyDescriptor desc)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        internal void Run()
+        {
+            // TODO: 순환참조 알림
+            // TODO: parent update 때 일단 전체 의존성 재계산
+            if (_relationReadable.IsCyclic) return;
+            InvalidatePropertiesByAnimation();
+            UpdateProperties();
+            PostRun();
+        }
+
+        private void InvalidatePropertiesByAnimation()
+        {
+            // TODO
+        }
+
+        private void PostRun()
+        {
+            _invalidatingTables.Clear();
+            _invalidatingProperties.Clear();
+        }
+
         private void UpdateProperties()
         {
             while (_invalidatingProperties.Any())
@@ -96,7 +98,7 @@ namespace ObservableTable.Engine
             }
         }
 
-        
+
         private void UpdateProperty(TableRuntime tableRuntime, string propertyName, Expression expr)
         {
             var ctx = new EvaluationContext(tableRuntime.ID, this);

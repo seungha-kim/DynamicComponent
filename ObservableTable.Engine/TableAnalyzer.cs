@@ -5,12 +5,15 @@ using Formula.AST;
 
 namespace ObservableTable.Engine
 {
-    internal class RelationManager : IRelationReadable
+    internal class TableAnalyzer : IRelationReadable
     {
+        private readonly Dictionary<PropertyDescriptor, Expression> _propertyExpressions =
+            new Dictionary<PropertyDescriptor, Expression>();
+
         private readonly Dictionary<PropertyDescriptor, HashSet<PropertyDescriptor>> _receivers;
         private readonly Dictionary<PropertyDescriptor, HashSet<PropertyDescriptor>> _references;
-        internal bool IsCyclic => Cycle is { };
         private List<PropertyDescriptor>? Cycle { get; set; }
+        public bool IsCyclic => Cycle is { };
 
         public IEnumerable<PropertyDescriptor> GetSenders(PropertyDescriptor desc)
         {
@@ -32,7 +35,12 @@ namespace ObservableTable.Engine
             throw new NotImplementedException();
         }
 
-        internal void RemoveReferences(PropertyDescriptor desc)
+        internal void RemoveTable(TableId id)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void RemoveProperty(PropertyDescriptor desc)
         {
             if (!_references.ContainsKey(desc)) return;
 
@@ -47,8 +55,9 @@ namespace ObservableTable.Engine
             }
         }
 
-        internal void UpdateReferences(PropertyDescriptor desc, Expression expr)
+        internal void UpdateProperty(PropertyDescriptor desc)
         {
+            var expr = _propertyExpressions[desc]!;
             foreach (var reference in expr.GetInnerReferences())
             {
                 var isInScope = false;

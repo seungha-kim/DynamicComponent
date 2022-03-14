@@ -4,6 +4,7 @@ namespace ObservableTable.Engine
 {
     internal interface IRelationReadable
     {
+        bool IsCyclic { get; }
         IEnumerable<PropertyDescriptor> GetSenders(PropertyDescriptor desc);
 
         IEnumerable<PropertyDescriptor> GetReceivers(PropertyDescriptor desc);
