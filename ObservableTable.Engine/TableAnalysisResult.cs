@@ -1,6 +1,7 @@
 ﻿namespace ObservableTable.Engine
 {
-    internal class FormulaExecutor
+    public class TableAnalysisResult
     {
+        
     }
 }

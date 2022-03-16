@@ -33,7 +33,13 @@ namespace ObservableTable.Engine
             var script = _scripts[id];
             if (script is null) throw new Exception("TODO: Non-existent id");
 
-            foreach (var pair in _scripts.Where(pair => pair.Value.Parent?.ID == id)) yield return pair.Value;
+            foreach (var pair in _scripts.Where(pair => pair.Value.ParentId == id)) yield return pair.Value;
+        }
+
+        public TableScript? GetParent(TableId id)
+        {
+            if (!(_scripts[id]?.ParentId is { } parentId)) return null;
+            return _scripts[parentId];
         }
 
         public event TableParentUpdateDelegate OnParentUpdate = delegate { };
@@ -58,6 +64,24 @@ namespace ObservableTable.Engine
             OnTableCreated.Invoke(id);
 
             return script;
+        }
+
+        internal PropertyDescriptor? GetSelfPropertyOfReference(TableId id, string identifier)
+        {
+            if (_scripts[id] is { } script && script.HasProperty(identifier))
+                return new PropertyDescriptor(id, identifier);
+            return null;
+        }
+
+        internal PropertyDescriptor? GetScopedPropertyOfReference(TableId id, string identifier, string propertyName)
+        {
+            if (!(GetParent(id) is { } parent)) return null;
+            if (parent.Name == identifier && parent.HasProperty(propertyName))
+                return new PropertyDescriptor(parent.ID, propertyName);
+            foreach (var child in GetChildren(parent.ID))
+                if (child.Name == identifier && child.HasProperty(propertyName))
+                    return new PropertyDescriptor(child.ID, propertyName);
+            return null;
         }
 
         public void RemoveTableScript(TableId id)

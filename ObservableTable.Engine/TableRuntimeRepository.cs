@@ -15,13 +15,11 @@ namespace ObservableTable.Engine
         private readonly HashSet<PropertyDescriptor> _invalidatingProperties;
         private readonly HashSet<TableId> _invalidatingTables;
         private readonly Stack<PropertyDescriptor> _propertyDfs;
-        private readonly IRelationReadable _relationReadable;
         private readonly ITableScriptReadable _scriptReadable;
         private readonly Dictionary<TableId, TableRuntime> _tables;
 
-        internal TableRuntimeRepository(ITableScriptReadable scriptManager, IRelationReadable relationReadable)
+        internal TableRuntimeRepository()
         {
-            _relationReadable = relationReadable;
             _tables = new Dictionary<TableId, TableRuntime>();
             _propertyDfs = new Stack<PropertyDescriptor>();
             _evaluator = Evaluation.createEvaluator();
@@ -36,13 +34,8 @@ namespace ObservableTable.Engine
 
         public TableRuntime? GetParent(TableId id)
         {
-            var script = _scriptReadable.GetTableScript(id);
-            if (script is null) throw new Exception("TODO: Non-existent id");
-            var parentScript = script?.Parent;
-            if (parentScript is null) return null;
-
-            _tables.TryGetValue(parentScript.ID, out var parent);
-            return parent;
+            if (!(_scriptReadable.GetTableScript(id)?.ParentId is { } parentId)) return null;
+            return _tables[parentId];
         }
 
         public IEnumerable<TableRuntime> GetChildrenById(TableId id)
@@ -57,22 +50,22 @@ namespace ObservableTable.Engine
             else if (_tables.ContainsKey(id) && _scriptReadable.GetTableScript(id) is null) _tables.Remove(id);
         }
 
-        internal void UpdateProperty(PropertyDescriptor desc)
+        internal void HandlePropertyUpdated(PropertyDescriptor desc)
         {
             _invalidatingProperties.Add(desc);
         }
 
-        internal void RemoveProperty(PropertyDescriptor desc)
+        internal void HandlePropertyRemoved(PropertyDescriptor desc)
         {
             throw new NotImplementedException();
         }
 
 
-        internal void Run()
+        internal void Run(TableAnalyzer analyzer)
         {
             // TODO: 순환참조 알림
             // TODO: parent update 때 일단 전체 의존성 재계산
-            if (_relationReadable.IsCyclic) return;
+            if (analyzer.IsCyclic) return;
             InvalidatePropertiesByAnimation();
             UpdateProperties();
             PostRun();

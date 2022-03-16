@@ -9,7 +9,7 @@ namespace ObservableTable.Engine
 
         public delegate void PropertyInvalidateDelegate(TableScript sender, string propertyName);
 
-        private TableScript? _parent;
+        private TableId? _parentId;
 
         internal TableScript(TableId id, string name)
         {
@@ -20,15 +20,15 @@ namespace ObservableTable.Engine
         public TableId ID { get; }
         public string Name { get; }
 
-        public TableScript? Parent
+        public TableId? ParentId
         {
-            get => _parent;
+            get => _parentId;
             set
             {
-                if (value == this) throw new Exception("TODO: Cannot be parent of self");
-                var oldParent = _parent;
-                _parent = value;
-                OnParentUpdate.Invoke(this, oldParent?.ID, _parent?.ID);
+                if (value == ID) throw new Exception("TODO: Cannot be parent of self");
+                var oldParentId = _parentId;
+                _parentId = value;
+                OnParentUpdate.Invoke(this, oldParentId, _parentId);
             }
         }
 

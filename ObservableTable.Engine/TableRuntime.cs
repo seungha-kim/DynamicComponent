@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Formula.ValueRepresentation;
 
 namespace ObservableTable.Engine
@@ -8,26 +8,27 @@ namespace ObservableTable.Engine
         public delegate void PropertyUpdateDelegate(TableRuntime sender, string propertyName, FormulaValue value);
 
         private TableScript _sourceScript;
+        private Dictionary<string, FormulaValue> _values;
         public TableId ID => _sourceScript.ID;
         public bool HasCopy { get; }
-        public TableId? ParentId => _sourceScript.Parent?.ID;
+        public TableId? ParentId => _sourceScript.ParentId;
         public string Name => _sourceScript.Name;
 
         public event PropertyUpdateDelegate OnPropertyUpdate = delegate { };
 
         public FormulaValue? GetProperty(string name)
         {
-            throw new NotImplementedException();
+            return _values[name];
         }
 
         public FormulaValue? GetPropertyOfCopy(string name, int index)
         {
-            throw new NotImplementedException();
+            return _values[name]; // TODO
         }
 
         internal void UpdateProperty(string name, FormulaValue value)
         {
-            throw new NotImplementedException();
+            _values[name] = value;
         }
     }
 }

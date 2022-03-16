@@ -1,5 +1,6 @@
 ﻿namespace Formula.AST
 
+open System
 open System.Collections.Generic
 open Formula.AST
 
@@ -11,7 +12,7 @@ type Expression =
     // Identifier
     | Ident of string
 
-    // Property
+    // Property: identifier.propertyName
     | PropertyExpr of string * string
 
     // Unary Operator
@@ -51,3 +52,14 @@ type Expression =
             | _ -> ()
 
         result
+
+    member this.AsIdentifierName() : string =
+        match this with
+        | Ident s -> s
+        | _ -> raise (Exception("TODO: Invalid casting"))
+
+
+    member this.AsProperty() : string * string =
+        match this with
+        | PropertyExpr (ident, prop) -> (ident, prop)
+        | _ -> raise (Exception("TODO: Invalid casting"))

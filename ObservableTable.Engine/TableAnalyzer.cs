@@ -1,28 +1,89 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Formula.AST;
 
 namespace ObservableTable.Engine
 {
-    internal class TableAnalyzer : IRelationReadable
+    internal class TableAnalyzer
     {
-        private readonly Dictionary<PropertyDescriptor, Expression> _propertyExpressions =
-            new Dictionary<PropertyDescriptor, Expression>();
-
         private readonly Dictionary<PropertyDescriptor, HashSet<PropertyDescriptor>> _receivers;
         private readonly Dictionary<PropertyDescriptor, HashSet<PropertyDescriptor>> _references;
+        private readonly HashSet<PropertyDescriptor> _removedProperties;
+
+        private readonly HashSet<PropertyDescriptor> _updatedProperties;
         private List<PropertyDescriptor>? Cycle { get; set; }
         public bool IsCyclic => Cycle is { };
 
-        public IEnumerable<PropertyDescriptor> GetSenders(PropertyDescriptor desc)
+        internal TableAnalysisResult Analyze(
+            TableAnalyzeContext context)
         {
+            foreach (var desc in _removedProperties)
+            {
+                // if (!_references.ContainsKey(desc)) return;
+
+                var references = _references[desc]!;
+                _references.Remove(desc);
+
+                foreach (var reference in references)
+                {
+                    var receivers = _receivers[reference]!;
+                    receivers.Remove(desc);
+                    if (!receivers.Any()) _receivers.Remove(reference);
+                }
+            }
+
+            UpdateDependencies(context.ScriptRepository, context.PropertyExpressionRepository);
+
             throw new NotImplementedException();
         }
 
-        public IEnumerable<PropertyDescriptor> GetReceivers(PropertyDescriptor desc)
+        private void UpdateDependencies(TableScriptRepository tableScriptRepository,
+            PropertyExpressionRepository propertyExpressionRepository)
         {
-            throw new NotImplementedException();
+            foreach (var desc in _updatedProperties)
+            {
+                var expr = propertyExpressionRepository.GetPropertyExpression(desc!);
+                foreach (var reference in expr.GetInnerReferences())
+                {
+                    if (reference.IsIdent)
+                    {
+                        var propertyName = reference.AsIdentifierName()!;
+                        if (tableScriptRepository.GetSelfPropertyOfReference(desc.ID, propertyName) is
+                            { } referenceDesc)
+                            AddDependency(desc, referenceDesc);
+                    }
+
+                    if (reference.IsPropertyExpr)
+                    {
+                        var (tableName, propertyName) = reference.AsProperty();
+                        if (tableScriptRepository.GetScopedPropertyOfReference(desc.ID, tableName, propertyName) is
+                            { } referenceDesc)
+                            AddDependency(desc, referenceDesc);
+                    }
+                }
+            }
+        }
+
+        private void AddDependency(PropertyDescriptor desc, PropertyDescriptor referenceDesc)
+        {
+            if (!_references.ContainsKey(desc)) _references[desc] = new HashSet<PropertyDescriptor>();
+            _references[desc].Add(referenceDesc);
+
+            if (!_receivers.ContainsKey(referenceDesc))
+                _receivers[referenceDesc] = new HashSet<PropertyDescriptor>();
+            _receivers[referenceDesc].Add(desc);
+        }
+
+        internal IEnumerable<PropertyDescriptor> GetSenders(PropertyDescriptor desc)
+        {
+            if (!(_references[desc] is { } references)) yield break;
+            foreach (var r in references) yield return r;
+        }
+
+        internal IEnumerable<PropertyDescriptor> GetReceivers(PropertyDescriptor desc)
+        {
+            if (!(_receivers[desc] is { } receivers)) yield break;
+            foreach (var r in receivers) yield return r;
         }
 
         internal IEnumerable<PropertyDescriptor>? GetPropertyCycle()
@@ -40,48 +101,19 @@ namespace ObservableTable.Engine
             throw new NotImplementedException();
         }
 
-        internal void RemoveProperty(PropertyDescriptor desc)
+        internal void HandlePropertyRemoved(PropertyDescriptor desc)
         {
-            if (!_references.ContainsKey(desc)) return;
-
-            var references = _references[desc]!;
-            _references.Remove(desc);
-
-            foreach (var reference in references)
-            {
-                var receivers = _receivers[reference]!;
-                receivers.Remove(desc);
-                if (!receivers.Any()) _receivers.Remove(reference);
-            }
+            _removedProperties.Add(desc);
         }
 
-        internal void UpdateProperty(PropertyDescriptor desc)
+        internal void HandlePropertyUpdated(PropertyDescriptor desc)
         {
-            var expr = _propertyExpressions[desc]!;
-            foreach (var reference in expr.GetInnerReferences())
-            {
-                var isInScope = false;
-                isInScope |= reference.IsIdent && CanReference(reference.IdentifierName);
-                isInScope |= reference.IsPropertyExpr && CanReference(Expression.PropertyExpr);
-                if (isInScope)
-                {
-                    var refDesc = reference.AsPropertyDescriptor;
-
-                    if (!_references.ContainsKey(desc)) _references[desc] = new HashSet<PropertyDescriptor>();
-                    _references[desc].Add(refDesc);
-
-                    if (!_receivers.ContainsKey(refDesc))
-                        _receivers[refDesc] = new HashSet<PropertyDescriptor>();
-                    _receivers[refDesc].Add(desc);
-                }
-            }
+            _updatedProperties.Add(desc);
         }
 
         internal bool CheckDependencyCycle()
         {
-            var visited = new HashSet<PropertyDescriptor>();
-
-            return false;
+            throw new NotImplementedException();
         }
     }
 }
