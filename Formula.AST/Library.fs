@@ -50,6 +50,8 @@ type Expression =
 
             | _ -> ()
 
+        traverse this
+
         result :> IEnumerable<Expression>
 
     member this.AsIdentifierName() : string =

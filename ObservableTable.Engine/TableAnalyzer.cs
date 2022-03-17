@@ -78,6 +78,7 @@ namespace ObservableTable.Engine
             var propertyExpressionRepository = context.PropertyExpressionRepository;
             var tableScriptRepository = context.ScriptRepository;
 
+            // TODO: self reference
             foreach (var desc in context.TableModificationSummary.UpdatedProperties)
             {
                 var expr = propertyExpressionRepository.GetPropertyExpression(desc);
