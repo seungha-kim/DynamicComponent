@@ -2,7 +2,6 @@
 
 open System
 open System.Collections.Generic
-open Formula.AST
 
 type Expression =
     // Literal
@@ -51,7 +50,7 @@ type Expression =
 
             | _ -> ()
 
-        result
+        result :> IEnumerable<Expression>
 
     member this.AsIdentifierName() : string =
         match this with

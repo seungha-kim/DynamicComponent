@@ -1,48 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Formula;
+using Formula.Interface;
 
 namespace ObservableTable.Engine
 {
     internal class TableAnalyzer
     {
-        private readonly Dictionary<PropertyDescriptor, HashSet<PropertyDescriptor>> _receivers;
+        // Components
+        private readonly IFormulaParser _parser;
+        private readonly ParsingContext _parsingContext;
+
+        private readonly Dictionary<PropertyDescriptor, HashSet<PropertyDescriptor>> _observers;
         private readonly Dictionary<PropertyDescriptor, HashSet<PropertyDescriptor>> _references;
-        private readonly HashSet<PropertyDescriptor> _removedProperties;
-
-        private readonly HashSet<PropertyDescriptor> _updatedProperties;
         private List<PropertyDescriptor>? Cycle { get; set; }
-        public bool IsCyclic => Cycle is { };
 
-        internal TableAnalysisResult Analyze(
-            TableAnalyzeContext context)
+        internal TableAnalyzer()
         {
-            foreach (var desc in _removedProperties)
+            _parser = Parsing.createParser();
+            _parsingContext = new ParsingContext();
+            _observers = new Dictionary<PropertyDescriptor, HashSet<PropertyDescriptor>>();
+            _references = new Dictionary<PropertyDescriptor, HashSet<PropertyDescriptor>>();
+        }
+
+        internal void Update(TableAnalyzeContext context)
+        {
+            UpdateExpressions(context);
+            InvalidateReferences(context);
+            UpdateReferences(context);
+        }
+
+        internal ITableAnalysisSummary GetSummary()
+        {
+            return new TableAnalysisSummary(this);
+        }
+
+        private void UpdateExpressions(TableAnalyzeContext context)
+        {
+            foreach (var removedDesc in context.TableModificationSummary.RemovedProperties)
             {
-                // if (!_references.ContainsKey(desc)) return;
+                context.PropertyExpressionRepository.RemovePropertyExpression(removedDesc);
+            }
+
+            foreach (var updatedDesc in context.TableModificationSummary.UpdatedProperties)
+            {
+                var formula =
+                    context.ScriptRepository.GetTableScript(updatedDesc.ID)!.GetPropertyFormula(updatedDesc.Name)!;
+                var expr = _parser.Parse(_parsingContext, formula);
+                // TODO: 에러 처리 - 애초에 Parse 가 Result 를 반환해야 될 것 같은데
+                context.PropertyExpressionRepository.SetPropertyExpression(updatedDesc, expr);
+            }
+        }
+
+        private void InvalidateReferences(TableAnalyzeContext context)
+        {
+            var summary = context.TableModificationSummary;
+            var invalidation = summary.RemovedProperties.Concat(summary.UpdatedProperties);
+            foreach (var desc in invalidation)
+            {
+                if (!_references.ContainsKey(desc)) continue;
 
                 var references = _references[desc]!;
                 _references.Remove(desc);
 
                 foreach (var reference in references)
                 {
-                    var receivers = _receivers[reference]!;
-                    receivers.Remove(desc);
-                    if (!receivers.Any()) _receivers.Remove(reference);
+                    var observers = _observers[reference]!;
+                    observers.Remove(desc);
+                    if (!observers.Any()) _observers.Remove(reference);
                 }
             }
-
-            UpdateDependencies(context.ScriptRepository, context.PropertyExpressionRepository);
-
-            throw new NotImplementedException();
         }
 
-        private void UpdateDependencies(TableScriptRepository tableScriptRepository,
-            PropertyExpressionRepository propertyExpressionRepository)
+        private void UpdateReferences(TableAnalyzeContext context)
         {
-            foreach (var desc in _updatedProperties)
+            var propertyExpressionRepository = context.PropertyExpressionRepository;
+            var tableScriptRepository = context.ScriptRepository;
+
+            foreach (var desc in context.TableModificationSummary.UpdatedProperties)
             {
-                var expr = propertyExpressionRepository.GetPropertyExpression(desc!);
+                var expr = propertyExpressionRepository.GetPropertyExpression(desc);
                 foreach (var reference in expr.GetInnerReferences())
                 {
                     if (reference.IsIdent)
@@ -50,7 +88,7 @@ namespace ObservableTable.Engine
                         var propertyName = reference.AsIdentifierName()!;
                         if (tableScriptRepository.GetSelfPropertyOfReference(desc.ID, propertyName) is
                             { } referenceDesc)
-                            AddDependency(desc, referenceDesc);
+                            AddReference(desc, referenceDesc);
                     }
 
                     if (reference.IsPropertyExpr)
@@ -58,62 +96,59 @@ namespace ObservableTable.Engine
                         var (tableName, propertyName) = reference.AsProperty();
                         if (tableScriptRepository.GetScopedPropertyOfReference(desc.ID, tableName, propertyName) is
                             { } referenceDesc)
-                            AddDependency(desc, referenceDesc);
+                            AddReference(desc, referenceDesc);
                     }
                 }
             }
         }
 
-        private void AddDependency(PropertyDescriptor desc, PropertyDescriptor referenceDesc)
+        private void AddReference(PropertyDescriptor desc, PropertyDescriptor referenceDesc)
         {
             if (!_references.ContainsKey(desc)) _references[desc] = new HashSet<PropertyDescriptor>();
             _references[desc].Add(referenceDesc);
 
-            if (!_receivers.ContainsKey(referenceDesc))
-                _receivers[referenceDesc] = new HashSet<PropertyDescriptor>();
-            _receivers[referenceDesc].Add(desc);
+            if (!_observers.ContainsKey(referenceDesc))
+                _observers[referenceDesc] = new HashSet<PropertyDescriptor>();
+            _observers[referenceDesc].Add(desc);
         }
 
-        internal IEnumerable<PropertyDescriptor> GetSenders(PropertyDescriptor desc)
+        private class ParsingContext : IParsingContext
         {
-            if (!(_references[desc] is { } references)) yield break;
-            foreach (var r in references) yield return r;
         }
 
-        internal IEnumerable<PropertyDescriptor> GetReceivers(PropertyDescriptor desc)
+        private class TableAnalysisSummary : ITableAnalysisSummary
         {
-            if (!(_receivers[desc] is { } receivers)) yield break;
-            foreach (var r in receivers) yield return r;
-        }
+            private TableAnalyzer _analyzer;
 
-        internal IEnumerable<PropertyDescriptor>? GetPropertyCycle()
-        {
-            return Cycle;
-        }
+            internal TableAnalysisSummary(TableAnalyzer analyzer)
+            {
+                _analyzer = analyzer;
+            }
 
-        internal bool IsPropertyInCycle(PropertyDescriptor desc)
-        {
-            throw new NotImplementedException();
-        }
+            IEnumerable<PropertyDescriptor> ITableAnalysisSummary.GetReferences(PropertyDescriptor desc)
+            {
+                if (!_analyzer._references.TryGetValue(desc, out var references))
+                    yield break;
+                foreach (var r in references) yield return r;
+            }
 
-        internal void RemoveTable(TableId id)
-        {
-            throw new NotImplementedException();
-        }
+            IEnumerable<PropertyDescriptor> ITableAnalysisSummary.GetObservers(PropertyDescriptor desc)
+            {
+                if (!_analyzer._observers.TryGetValue(desc, out var observers)) yield break;
+                foreach (var r in observers) yield return r;
+            }
 
-        internal void HandlePropertyRemoved(PropertyDescriptor desc)
-        {
-            _removedProperties.Add(desc);
-        }
+            bool ITableAnalysisSummary.IsCyclic => _analyzer.Cycle is { };
 
-        internal void HandlePropertyUpdated(PropertyDescriptor desc)
-        {
-            _updatedProperties.Add(desc);
-        }
+            IEnumerable<PropertyDescriptor>? ITableAnalysisSummary.GetReferenceCycle()
+            {
+                return _analyzer.Cycle;
+            }
 
-        internal bool CheckDependencyCycle()
-        {
-            throw new NotImplementedException();
+            bool ITableAnalysisSummary.IsPropertyInCycle(PropertyDescriptor desc)
+            {
+                return _analyzer.Cycle?.Contains(desc) ?? false;
+            }
         }
     }
 }

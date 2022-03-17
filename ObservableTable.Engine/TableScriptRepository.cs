@@ -14,10 +14,6 @@ namespace ObservableTable.Engine
 
         public delegate void TableParentUpdateDelegate(TableId id, TableId? oldParent, TableId? newParent);
 
-        // Components
-        private readonly IFormulaParser _parser = Parsing.createParser();
-        private readonly ParsingContext _parsingContext = new ParsingContext();
-
         // Data
         private readonly Dictionary<TableId, TableScript> _scripts = new Dictionary<TableId, TableScript>();
 
@@ -99,8 +95,6 @@ namespace ObservableTable.Engine
         private void HandlePropertyFormulaUpdate(TableScript sender, string propertyName)
         {
             var desc = new PropertyDescriptor(sender.ID, propertyName);
-            var formula = sender.GetPropertyFormula(propertyName)!;
-            var expr = _parser.Parse(_parsingContext, formula);
             OnPropertyUpdated.Invoke(desc);
         }
 
@@ -113,10 +107,6 @@ namespace ObservableTable.Engine
         private void HandleParentUpdate(TableScript sender, TableId? oldParent, TableId? newParent)
         {
             OnParentUpdate.Invoke(sender.ID, oldParent, newParent);
-        }
-
-        private class ParsingContext : IParsingContext
-        {
         }
     }
 }

@@ -6,13 +6,7 @@ namespace ObservableTable.Engine
     {
         internal PropertyExpressionRepository PropertyExpressionRepository { get; set; }
         internal TableRuntimeRepository RuntimeRepository { get; set; }
-
-        internal TableAnalysisResult AnalysisResult { get; set; }
-
-        internal IEnumerable<TableId> CreatedTableIds { get; set; }
-        internal IEnumerable<TableId> RemovedTableIds { get; set; }
-        internal IEnumerable<(TableId table, TableId? oldParent, TableId? newParent)> ParentUpdates { get; set; }
-        internal IEnumerable<PropertyDescriptor> UpdatedProperties { get; set; }
-        internal IEnumerable<PropertyDescriptor> RemovedProperties { get; set; }
+        internal ITableAnalysisSummary AnalysisSummary { get; set; }
+        internal TableModificationSummary TableModificationSummary { get; set; }
     }
 }

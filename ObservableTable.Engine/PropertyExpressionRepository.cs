@@ -19,6 +19,11 @@ namespace ObservableTable.Engine
             _propertyExpressions[desc] = expr;
         }
 
+        internal void RemovePropertyExpression(PropertyDescriptor desc)
+        {
+            _propertyExpressions.Remove(desc);
+        }
+
         public IEnumerable<Expression> GetTablePropertyExpressions(TableId id)
         {
             return from desc in _propertyExpressions.Keys
