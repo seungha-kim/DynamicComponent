@@ -10,7 +10,6 @@ namespace ObservableTable.Engine
 {
     internal class TableRuntimeRepository : ITableRuntimeReadable
     {
-        private readonly ITableScriptReadable _scriptReadable;
         private readonly Dictionary<TableId, TableRuntime> _tables;
 
         internal TableRuntimeRepository()
@@ -25,13 +24,18 @@ namespace ObservableTable.Engine
 
         public TableRuntime? GetParent(TableId id)
         {
-            if (!(_scriptReadable.GetTableScript(id)?.ParentId is { } parentId)) return null;
+            if (!_tables.TryGetValue(id, out var table)) return null;
+            if (!(table.ParentId is { } parentId)) return null;
             return _tables[parentId];
         }
 
-        public IEnumerable<TableRuntime> GetChildrenById(TableId id)
+        public TableRuntime CreateTable(TableScript sourceScript)
         {
-            return _scriptReadable.GetChildren(id).Select(script => _tables[script.ID]!);
+            var id = sourceScript.ID;
+            if (_tables.ContainsKey(id)) throw new Exception("TODO: existing id");
+            var result = new TableRuntime(sourceScript);
+            _tables[id] = result;
+            return result;
         }
     }
 }

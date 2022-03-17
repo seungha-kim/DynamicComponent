@@ -9,10 +9,18 @@ namespace ObservableTable.Engine
 
         private TableScript _sourceScript;
         private Dictionary<string, FormulaValue> _values;
+
         public TableId ID => _sourceScript.ID;
-        public bool HasCopy { get; }
+
+        // public bool HasCopy { get; }
         public TableId? ParentId => _sourceScript.ParentId;
         public string Name => _sourceScript.Name;
+
+        public TableRuntime(TableScript sourceScript)
+        {
+            _sourceScript = sourceScript;
+            _values = new Dictionary<string, FormulaValue>();
+        }
 
         public event PropertyUpdateDelegate OnPropertyUpdate = delegate { };
 

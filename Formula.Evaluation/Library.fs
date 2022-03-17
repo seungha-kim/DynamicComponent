@@ -53,6 +53,10 @@ module private impl =
         | SubtractOp (lhs, rhs) -> simpleFloatBinaryOp ctx lhs rhs (-)
         | MultiplyOp (lhs, rhs) -> simpleFloatBinaryOp ctx lhs rhs (*)
         | FunctionExpr (name, args) -> evaluateFunction ctx name args
+        | Ident ident -> ctx.GetIdentifierValue(ident) |> Ok // TODO: Ok 일리가...
+        | PropertyExpr (tableName, propertyName) ->
+            ctx.GetPropertyValue(tableName, propertyName)
+            |> Ok // TODO: Ok 일리가...
         | InvalidExpr _ -> InvalidExpression |> Error
 
     and evaluateFunction ctx name args =

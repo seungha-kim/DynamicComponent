@@ -6,6 +6,5 @@ namespace ObservableTable.Engine
     {
         TableRuntime? GetTableById(TableId id);
         TableRuntime? GetParent(TableId id);
-        IEnumerable<TableRuntime> GetChildrenById(TableId id);
     }
 }

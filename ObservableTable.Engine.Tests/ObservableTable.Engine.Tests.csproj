@@ -59,6 +59,10 @@
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj">
+        <Project>{1f366fa6-2af2-40a2-b51e-ad0fe451707c}</Project>
+        <Name>Formula.ValueRepresentation</Name>
+      </ProjectReference>
       <ProjectReference Include="..\ObservableTable.Engine\ObservableTable.Engine.csproj">
         <Project>{53eb63a0-ab78-4d9b-b129-0f0697146182}</Project>
         <Name>ObservableTable.Engine</Name>

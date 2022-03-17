@@ -43,6 +43,7 @@ namespace ObservableTable.Engine
 
             _tableExecutor.Execute(new TableExecuteContext()
             {
+                ScriptRepository = _scriptRepository,
                 PropertyExpressionRepository = _propertyExpressionRepository,
                 RuntimeRepository = _runtimeRepository,
                 AnalysisSummary = analysisSummary,

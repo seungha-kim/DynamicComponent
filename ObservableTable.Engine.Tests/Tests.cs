@@ -1,39 +1,67 @@
 ﻿using System;
 using System.Linq;
+using Formula.ValueRepresentation;
 using Xunit;
 using ObservableTable.Engine;
 
 namespace ObservableTable.Engine.Tests
 {
-    public class Tests
+    internal class BasicTestCase
     {
-        [Fact]
-        public void TestTableAnalyzer_SimpleCase()
-        {
-            var summary = new TableModificationSummary();
-            var exprRepo = new PropertyExpressionRepository();
-            var scriptRepo = new TableScriptRepository();
-            summary.Connect(scriptRepo);
+        internal TableModificationSummary ModificationSummary { get; }
+        internal TableScriptRepository ScriptRepository { get; }
+        internal PropertyExpressionRepository ExpressionRepository { get; }
+        internal TableAnalyzer TableAnalyzer { get; }
+        internal TableExecutor TableExecutor { get; }
+        internal TableRuntimeRepository RuntimeRepository { get; }
 
-            var script1 = scriptRepo.CreateTableScript(new TableId("id1"), "name1");
+        internal BasicTestCase()
+        {
+            ModificationSummary = new TableModificationSummary();
+            ScriptRepository = new TableScriptRepository();
+            ExpressionRepository = new PropertyExpressionRepository();
+            TableAnalyzer = new TableAnalyzer();
+            TableExecutor = new TableExecutor();
+            RuntimeRepository = new TableRuntimeRepository();
+
+            ModificationSummary.Connect(ScriptRepository);
+
+            var script1 = ScriptRepository.CreateTableScript(new TableId("id1"), "name1");
             script1.UpdatePropertyFormula("x", "y");
             script1.UpdatePropertyFormula("y", "1");
             script1.UpdatePropertyFormula("z", "name2!a + y");
             script1.ParentId = new TableId("id2");
 
-            var script2 = scriptRepo.CreateTableScript(new TableId("id2"), "name2");
+            var script2 = ScriptRepository.CreateTableScript(new TableId("id2"), "name2");
             script2.UpdatePropertyFormula("a", "2");
 
-            // TODO: 자식 속성도 참조 가능?
-
-            var analyzer = new TableAnalyzer();
-            analyzer.Update(new TableAnalyzeContext()
+            TableAnalyzer.Update(new TableAnalyzeContext()
             {
-                ScriptRepository = scriptRepo,
-                PropertyExpressionRepository = exprRepo,
-                TableModificationSummary = summary
+                ScriptRepository = ScriptRepository,
+                PropertyExpressionRepository = ExpressionRepository,
+                TableModificationSummary = ModificationSummary
             });
-            var analysis = analyzer.GetSummary();
+
+            TableExecutor.Execute(new TableExecuteContext()
+            {
+                ScriptRepository = ScriptRepository,
+                PropertyExpressionRepository = ExpressionRepository,
+                RuntimeRepository = RuntimeRepository,
+                AnalysisSummary = TableAnalyzer.GetSummary(),
+                TableModificationSummary = ModificationSummary
+            });
+
+            // TODO: cyclic
+        }
+    }
+
+    public class Tests
+    {
+        [Fact]
+        public void TestSimpleCase_TableAnalyzer()
+        {
+            var testCase = new BasicTestCase();
+            var analysis = testCase.TableAnalyzer.GetSummary();
 
             {
                 // x -> y
@@ -88,6 +116,24 @@ namespace ObservableTable.Engine.Tests
                 var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("id1"), "x")).ToList();
                 Assert.Equal(observers.Count, 0);
             }
+        }
+
+        [Fact]
+        public void TestSimpleCase_TableRunner()
+        {
+            var testCase = new BasicTestCase();
+
+            Assert.Equal(FormulaValue.NewNumberValue(1.0f),
+                testCase.RuntimeRepository.GetTableById(new TableId("id1"))?.GetProperty("x"));
+
+            Assert.Equal(FormulaValue.NewNumberValue(1.0f),
+                testCase.RuntimeRepository.GetTableById(new TableId("id1"))?.GetProperty("y"));
+
+            Assert.Equal(FormulaValue.NewNumberValue(3.0f),
+                testCase.RuntimeRepository.GetTableById(new TableId("id1"))?.GetProperty("z"));
+
+            Assert.Equal(FormulaValue.NewNumberValue(2.0f),
+                testCase.RuntimeRepository.GetTableById(new TableId("id2"))?.GetProperty("a"));
         }
     }
 }
