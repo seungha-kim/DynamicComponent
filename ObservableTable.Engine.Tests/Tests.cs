@@ -30,11 +30,19 @@ namespace ObservableTable.Engine.Tests
             script1.UpdatePropertyFormula("x", "y");
             script1.UpdatePropertyFormula("y", "1");
             script1.UpdatePropertyFormula("z", "name2!a + y");
+            script1.UpdatePropertyFormula("w", "z");
             script1.ParentId = new TableId("id2");
 
             var script2 = ScriptRepository.CreateTableScript(new TableId("id2"), "name2");
             script2.UpdatePropertyFormula("a", "2");
 
+            Run();
+
+            // TODO: cyclic
+        }
+
+        internal void Run()
+        {
             TableAnalyzer.Update(new TableAnalyzeContext()
             {
                 ScriptRepository = ScriptRepository,
@@ -50,8 +58,7 @@ namespace ObservableTable.Engine.Tests
                 AnalysisSummary = TableAnalyzer.GetSummary(),
                 TableModificationSummary = ModificationSummary
             });
-
-            // TODO: cyclic
+            ModificationSummary.Clear();
         }
     }
 
@@ -98,8 +105,14 @@ namespace ObservableTable.Engine.Tests
             }
 
             {
-                // z <- ?
+                // z <- w
                 var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("id1"), "z")).ToList();
+                Assert.Equal(observers.Count, 1);
+            }
+
+            {
+                // w <- ?
+                var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("id1"), "w")).ToList();
                 Assert.Equal(observers.Count, 0);
             }
 
@@ -134,6 +147,26 @@ namespace ObservableTable.Engine.Tests
 
             Assert.Equal(FormulaValue.NewNumberValue(2.0f),
                 testCase.RuntimeRepository.GetTableById(new TableId("id2"))?.GetProperty("a"));
+        }
+
+        [Fact]
+        public void TestSimpleCase_UpdateObservers()
+        {
+            var tc = new BasicTestCase();
+
+            var script1 = tc.ScriptRepository.GetTableScript(new TableId("id1"));
+            script1.UpdatePropertyFormula("y", "10");
+
+            var script2 = tc.ScriptRepository.GetTableScript(new TableId("id2"));
+            script2.UpdatePropertyFormula("a", "20");
+
+            tc.Run();
+
+            Assert.Equal(FormulaValue.NewNumberValue(30.0f),
+                tc.RuntimeRepository.GetTableById(new TableId("id1"))?.GetProperty("z"));
+
+            Assert.Equal(FormulaValue.NewNumberValue(30.0f),
+                tc.RuntimeRepository.GetTableById(new TableId("id1"))?.GetProperty("w"));
         }
     }
 }

@@ -33,10 +33,14 @@ namespace ObservableTable.Engine
             scriptRepository.OnPropertyUpdated += desc => _updatedProperties.Add(desc);
             scriptRepository.OnPropertyRemoved += desc => _removedProperties.Add(desc);
         }
-        
+
         internal void Clear()
         {
-            
+            _createdTableIds.Clear();
+            _removedProperties.Clear();
+            _parentUpdates.Clear();
+            _updatedProperties.Clear();
+            _removedProperties.Clear();
         }
     }
 }

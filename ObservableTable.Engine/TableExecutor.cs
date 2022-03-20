@@ -10,12 +10,12 @@ namespace ObservableTable.Engine
     internal class TableExecutor
     {
         private readonly IFormulaEvaluator _evaluator;
-        private readonly HashSet<PropertyDescriptor> _notVisited;
+        private readonly HashSet<PropertyDescriptor> _invalidating;
 
         public TableExecutor()
         {
             _evaluator = Evaluation.createEvaluator();
-            _notVisited = new HashSet<PropertyDescriptor>();
+            _invalidating = new HashSet<PropertyDescriptor>();
         }
 
         internal void Execute(TableExecuteContext context)
@@ -31,34 +31,46 @@ namespace ObservableTable.Engine
                 context.RuntimeRepository.CreateTable(sourceScript);
             }
 
-            EvaluateProperties(context);
-        }
-
-        private void EvaluateProperties(TableExecuteContext context)
-        {
             // TODO: removed properties
             // TODO: removed tables
             // TODO: removed parent?
-            _notVisited.Clear();
+            InvalidateProperties(context);
+            UpdateInvalidatedProperties(context);
+            _invalidating.Clear();
+        }
+
+        private void InvalidateProperties(TableExecuteContext context)
+        {
             foreach (var desc in context.TableModificationSummary.UpdatedProperties)
             {
-                _notVisited.Add(desc);
+                VisitForInvalidation(desc);
             }
 
-            while (_notVisited.Any())
+            void VisitForInvalidation(PropertyDescriptor desc)
             {
-                Visit(_notVisited.First());
+                _invalidating.Add(desc);
+                foreach (var observer in context.AnalysisSummary.GetObservers(desc))
+                {
+                    VisitForInvalidation(observer);
+                }
             }
-            // TODO: 문제 있음 - observer 는 업데이트가 되지 않음. 업데이트 되어야 하는 속성 마킹하는 단계 추가
+        }
 
-            void Visit(PropertyDescriptor desc)
+        private void UpdateInvalidatedProperties(TableExecuteContext context)
+        {
+            while (_invalidating.Any())
             {
-                if (!_notVisited.Contains(desc)) return;
+                VisitForEvaluation(_invalidating.First());
+            }
 
-                _notVisited.Remove(desc);
+            void VisitForEvaluation(PropertyDescriptor desc)
+            {
+                if (!_invalidating.Contains(desc)) return;
+
+                _invalidating.Remove(desc);
                 foreach (var reference in context.AnalysisSummary.GetReferences(desc))
                 {
-                    Visit(reference);
+                    VisitForEvaluation(reference);
                 }
 
                 var expr = context.PropertyExpressionRepository.GetPropertyExpression(desc)!;
