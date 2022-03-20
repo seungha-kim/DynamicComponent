@@ -26,12 +26,12 @@ namespace ObservableTable.Engine
 
         public FormulaValue? GetProperty(string name)
         {
-            return _values[name];
+            return _values.TryGetValue(name, out var result) ? result : null;
         }
 
         public FormulaValue? GetPropertyOfCopy(string name, int index)
         {
-            return _values[name]; // TODO
+            return _values.TryGetValue(name, out var result) ? result : null; // TODO
         }
 
         internal void UpdateProperty(string name, FormulaValue value)

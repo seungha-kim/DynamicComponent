@@ -29,6 +29,14 @@ namespace ObservableTable.Engine
             UpdateExpressions(context);
             InvalidateReferences(context);
             UpdateReferences(context);
+            CheckCycle(context);
+        }
+
+        private void CheckCycle(TableAnalyzeContext context)
+        {
+            // HashSet<PropertyDescriptor> notVisited = new HashSet<PropertyDescriptor>(context.ScriptRepository)
+            // List<PropertyDescriptor> 
+            // TODO: 재귀로 구현하기
         }
 
         internal ITableAnalysisSummary GetSummary()
@@ -55,6 +63,7 @@ namespace ObservableTable.Engine
 
         private void InvalidateReferences(TableAnalyzeContext context)
         {
+            // TODO: 문제 있음 - executor 에서 observer 는 업데이트가 되지 않음. 업데이트 되어야 하는 속성 마킹하는 단계 추가
             var summary = context.TableModificationSummary;
             var invalidation = summary.RemovedProperties.Concat(summary.UpdatedProperties);
             foreach (var desc in invalidation)
@@ -149,6 +158,11 @@ namespace ObservableTable.Engine
             bool ITableAnalysisSummary.IsPropertyInCycle(PropertyDescriptor desc)
             {
                 return _analyzer.Cycle?.Contains(desc) ?? false;
+            }
+
+            IEnumerable<PropertyDescriptor> ITableAnalysisSummary.GetPropertyInvalidationSet()
+            {
+                throw new NotImplementedException();
             }
         }
     }

@@ -31,6 +31,11 @@ namespace ObservableTable.Engine
                 context.RuntimeRepository.CreateTable(sourceScript);
             }
 
+            EvaluateProperties(context);
+        }
+
+        private void EvaluateProperties(TableExecuteContext context)
+        {
             // TODO: removed properties
             // TODO: removed tables
             // TODO: removed parent?
@@ -42,25 +47,26 @@ namespace ObservableTable.Engine
 
             while (_notVisited.Any())
             {
-                EvaluateProperty(context, _notVisited.First());
+                Visit(_notVisited.First());
             }
-        }
+            // TODO: 문제 있음 - observer 는 업데이트가 되지 않음. 업데이트 되어야 하는 속성 마킹하는 단계 추가
 
-        private void EvaluateProperty(TableExecuteContext context, PropertyDescriptor desc)
-        {
-            if (!_notVisited.Contains(desc)) return;
-
-            _notVisited.Remove(desc);
-            foreach (var reference in context.AnalysisSummary.GetReferences(desc))
+            void Visit(PropertyDescriptor desc)
             {
-                EvaluateProperty(context, reference);
-            }
+                if (!_notVisited.Contains(desc)) return;
 
-            var expr = context.PropertyExpressionRepository.GetPropertyExpression(desc)!;
-            var evaluationContext = new EvaluationContext(desc.ID, context);
-            var value = _evaluator.Evaluate(evaluationContext, expr);
-            var table = context.RuntimeRepository.GetTableById(desc.ID)!;
-            table.UpdateProperty(desc.Name, value);
+                _notVisited.Remove(desc);
+                foreach (var reference in context.AnalysisSummary.GetReferences(desc))
+                {
+                    Visit(reference);
+                }
+
+                var expr = context.PropertyExpressionRepository.GetPropertyExpression(desc)!;
+                var evaluationContext = new EvaluationContext(desc.ID, context);
+                var value = _evaluator.Evaluate(evaluationContext, expr);
+                var table = context.RuntimeRepository.GetTableById(desc.ID)!;
+                table.UpdateProperty(desc.Name, value);
+            }
         }
 
         private class EvaluationContext : IEvaluationContext

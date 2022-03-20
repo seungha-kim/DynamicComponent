@@ -10,5 +10,6 @@ namespace ObservableTable.Engine
         internal bool IsCyclic { get; }
         internal IEnumerable<PropertyDescriptor>? GetReferenceCycle();
         internal bool IsPropertyInCycle(PropertyDescriptor desc);
+        internal IEnumerable<PropertyDescriptor> GetPropertyInvalidationSet();
     }
 }
