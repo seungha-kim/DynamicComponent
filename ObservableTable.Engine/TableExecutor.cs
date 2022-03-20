@@ -10,12 +10,12 @@ namespace ObservableTable.Engine
     internal class TableExecutor
     {
         private readonly IFormulaEvaluator _evaluator;
-        private readonly HashSet<PropertyDescriptor> _invalidating;
+        private readonly HashSet<PropertyDescriptor> _staleProperties;
 
         public TableExecutor()
         {
             _evaluator = Evaluation.createEvaluator();
-            _invalidating = new HashSet<PropertyDescriptor>();
+            _staleProperties = new HashSet<PropertyDescriptor>();
         }
 
         internal void Execute(TableExecuteContext context)
@@ -35,42 +35,42 @@ namespace ObservableTable.Engine
             // TODO: removed tables
             // TODO: removed parent?
             InvalidateProperties(context);
-            UpdateInvalidatedProperties(context);
-            _invalidating.Clear();
+            UpdateStaleProperties(context);
+            _staleProperties.Clear();
         }
 
         private void InvalidateProperties(TableExecuteContext context)
         {
             foreach (var desc in context.TableModificationSummary.UpdatedProperties)
             {
-                VisitForInvalidation(desc);
+                Visit(desc);
             }
 
-            void VisitForInvalidation(PropertyDescriptor desc)
+            void Visit(PropertyDescriptor desc)
             {
-                _invalidating.Add(desc);
+                _staleProperties.Add(desc);
                 foreach (var observer in context.AnalysisSummary.GetObservers(desc))
                 {
-                    VisitForInvalidation(observer);
+                    Visit(observer);
                 }
             }
         }
 
-        private void UpdateInvalidatedProperties(TableExecuteContext context)
+        private void UpdateStaleProperties(TableExecuteContext context)
         {
-            while (_invalidating.Any())
+            while (_staleProperties.Any())
             {
-                VisitForEvaluation(_invalidating.First());
+                Visit(_staleProperties.First());
             }
 
-            void VisitForEvaluation(PropertyDescriptor desc)
+            void Visit(PropertyDescriptor desc)
             {
-                if (!_invalidating.Contains(desc)) return;
+                if (!_staleProperties.Contains(desc)) return;
 
-                _invalidating.Remove(desc);
+                _staleProperties.Remove(desc);
                 foreach (var reference in context.AnalysisSummary.GetReferences(desc))
                 {
-                    VisitForEvaluation(reference);
+                    Visit(reference);
                 }
 
                 var expr = context.PropertyExpressionRepository.GetPropertyExpression(desc)!;
