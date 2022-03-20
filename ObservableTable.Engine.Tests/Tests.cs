@@ -26,22 +26,20 @@ namespace ObservableTable.Engine.Tests
 
             ModificationSummary.Connect(ScriptRepository);
 
-            var script1 = ScriptRepository.CreateTableScript(new TableId("id1"), "name1");
-            script1.UpdatePropertyFormula("x", "y");
-            script1.UpdatePropertyFormula("y", "1");
-            script1.UpdatePropertyFormula("z", "name2!a + y");
-            script1.UpdatePropertyFormula("w", "z");
-            script1.ParentId = new TableId("id2");
+            var scriptParent = ScriptRepository.CreateTableScript(new TableId("idParent"), "parent");
+            scriptParent.UpdatePropertyFormula("a", "2");
 
-            var script2 = ScriptRepository.CreateTableScript(new TableId("id2"), "name2");
-            script2.UpdatePropertyFormula("a", "2");
+            var scriptChild1 = ScriptRepository.CreateTableScript(new TableId("idChild1"), "child1");
+            scriptChild1.UpdatePropertyFormula("x", "y");
+            scriptChild1.UpdatePropertyFormula("y", "1");
+            scriptChild1.UpdatePropertyFormula("z", "parent!a + y");
+            scriptChild1.UpdatePropertyFormula("w", "z");
+            scriptChild1.ParentId = scriptParent.ID;
 
             Run();
-
-            // TODO: cyclic
         }
 
-        internal void Run()
+        internal void Run(bool keepInternalState = false)
         {
             TableAnalyzer.Update(new TableAnalyzeContext()
             {
@@ -58,7 +56,11 @@ namespace ObservableTable.Engine.Tests
                 AnalysisSummary = TableAnalyzer.GetSummary(),
                 TableModificationSummary = ModificationSummary
             });
-            ModificationSummary.Clear();
+
+            if (!keepInternalState)
+            {
+                ModificationSummary.Clear();
+            }
         }
     }
 
@@ -72,61 +74,61 @@ namespace ObservableTable.Engine.Tests
 
             {
                 // x -> y
-                var references = analysis.GetReferences(new PropertyDescriptor(new TableId("id1"), "x")).ToList();
+                var references = analysis.GetReferences(new PropertyDescriptor(new TableId("idChild1"), "x")).ToList();
                 Assert.Equal(references.Count, 1);
-                Assert.True(references.Contains(new PropertyDescriptor(new TableId("id1"), "y")));
+                Assert.True(references.Contains(new PropertyDescriptor(new TableId("idChild1"), "y")));
             }
 
             {
                 // y -> ?
-                var references = analysis.GetReferences(new PropertyDescriptor(new TableId("id1"), "y")).ToList();
+                var references = analysis.GetReferences(new PropertyDescriptor(new TableId("idChild1"), "y")).ToList();
                 Assert.Equal(references.Count, 0);
             }
 
             {
-                // z -> name2!a, y
-                var references = analysis.GetReferences(new PropertyDescriptor(new TableId("id1"), "z")).ToList();
+                // z -> parent!a, y
+                var references = analysis.GetReferences(new PropertyDescriptor(new TableId("idChild1"), "z")).ToList();
                 Assert.Equal(references.Count, 2);
-                Assert.True(references.Contains(new PropertyDescriptor(new TableId("id1"), "y")));
-                Assert.True(references.Contains(new PropertyDescriptor(new TableId("id2"), "a")));
+                Assert.True(references.Contains(new PropertyDescriptor(new TableId("idChild1"), "y")));
+                Assert.True(references.Contains(new PropertyDescriptor(new TableId("idParent"), "a")));
             }
 
             {
                 // a -> ?
-                var references = analysis.GetReferences(new PropertyDescriptor(new TableId("id2"), "a")).ToList();
+                var references = analysis.GetReferences(new PropertyDescriptor(new TableId("idParent"), "a")).ToList();
                 Assert.Equal(references.Count, 0);
             }
 
             {
-                // name2!a <- z
-                var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("id2"), "a")).ToList();
+                // parent!a <- z
+                var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("idParent"), "a")).ToList();
                 Assert.Equal(observers.Count, 1);
-                Assert.True(observers.Contains(new PropertyDescriptor(new TableId("id1"), "z")));
+                Assert.True(observers.Contains(new PropertyDescriptor(new TableId("idChild1"), "z")));
             }
 
             {
                 // z <- w
-                var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("id1"), "z")).ToList();
+                var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("idChild1"), "z")).ToList();
                 Assert.Equal(observers.Count, 1);
             }
 
             {
                 // w <- ?
-                var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("id1"), "w")).ToList();
+                var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("idChild1"), "w")).ToList();
                 Assert.Equal(observers.Count, 0);
             }
 
             {
                 // y <- x, z
-                var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("id1"), "y")).ToList();
+                var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("idChild1"), "y")).ToList();
                 Assert.Equal(observers.Count, 2);
-                Assert.True(observers.Contains(new PropertyDescriptor(new TableId("id1"), "x")));
-                Assert.True(observers.Contains(new PropertyDescriptor(new TableId("id1"), "z")));
+                Assert.True(observers.Contains(new PropertyDescriptor(new TableId("idChild1"), "x")));
+                Assert.True(observers.Contains(new PropertyDescriptor(new TableId("idChild1"), "z")));
             }
 
             {
                 // x <- ?
-                var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("id1"), "x")).ToList();
+                var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("idChild1"), "x")).ToList();
                 Assert.Equal(observers.Count, 0);
             }
         }
@@ -137,16 +139,16 @@ namespace ObservableTable.Engine.Tests
             var testCase = new BasicTestCase();
 
             Assert.Equal(FormulaValue.NewNumberValue(1.0f),
-                testCase.RuntimeRepository.GetTableById(new TableId("id1"))?.GetProperty("x"));
+                testCase.RuntimeRepository.GetTableById(new TableId("idChild1"))?.GetProperty("x"));
 
             Assert.Equal(FormulaValue.NewNumberValue(1.0f),
-                testCase.RuntimeRepository.GetTableById(new TableId("id1"))?.GetProperty("y"));
+                testCase.RuntimeRepository.GetTableById(new TableId("idChild1"))?.GetProperty("y"));
 
             Assert.Equal(FormulaValue.NewNumberValue(3.0f),
-                testCase.RuntimeRepository.GetTableById(new TableId("id1"))?.GetProperty("z"));
+                testCase.RuntimeRepository.GetTableById(new TableId("idChild1"))?.GetProperty("z"));
 
             Assert.Equal(FormulaValue.NewNumberValue(2.0f),
-                testCase.RuntimeRepository.GetTableById(new TableId("id2"))?.GetProperty("a"));
+                testCase.RuntimeRepository.GetTableById(new TableId("idParent"))?.GetProperty("a"));
         }
 
         [Fact]
@@ -154,19 +156,49 @@ namespace ObservableTable.Engine.Tests
         {
             var tc = new BasicTestCase();
 
-            var script1 = tc.ScriptRepository.GetTableScript(new TableId("id1"));
-            script1.UpdatePropertyFormula("y", "10");
+            var scriptChild1 = tc.ScriptRepository.GetTableScript(new TableId("idChild1"));
+            scriptChild1.UpdatePropertyFormula("y", "10");
 
-            var script2 = tc.ScriptRepository.GetTableScript(new TableId("id2"));
-            script2.UpdatePropertyFormula("a", "20");
+            var scriptParent = tc.ScriptRepository.GetTableScript(new TableId("idParent"));
+            scriptParent.UpdatePropertyFormula("a", "20");
 
             tc.Run();
 
             Assert.Equal(FormulaValue.NewNumberValue(30.0f),
-                tc.RuntimeRepository.GetTableById(new TableId("id1"))?.GetProperty("z"));
+                tc.RuntimeRepository.GetTableById(new TableId("idChild1"))?.GetProperty("z"));
 
             Assert.Equal(FormulaValue.NewNumberValue(30.0f),
-                tc.RuntimeRepository.GetTableById(new TableId("id1"))?.GetProperty("w"));
+                tc.RuntimeRepository.GetTableById(new TableId("idChild1"))?.GetProperty("w"));
+        }
+
+        [Fact]
+        public void TestSimpleCase_Cyclic()
+        {
+            var tc = new BasicTestCase();
+
+            // cycle with length 2
+            var scriptChild1 = tc.ScriptRepository.GetTableScript(new TableId("idChild1"));
+            scriptChild1.UpdatePropertyFormula("y", "x");
+
+            tc.Run();
+
+            var summary = tc.TableAnalyzer.GetSummary();
+            Assert.True(summary.IsCyclic);
+
+            var cycle = summary.GetAllReferenceCycle()!.ToHashSet();
+            Assert.Equal(4, cycle.Count);
+            Assert.Contains(new PropertyDescriptor(new TableId("idChild1"), "x"), cycle);
+            Assert.Contains(new PropertyDescriptor(new TableId("idChild1"), "y"), cycle);
+            Assert.Contains(new PropertyDescriptor(new TableId("idChild1"), "z"), cycle);
+            Assert.Contains(new PropertyDescriptor(new TableId("idChild1"), "w"), cycle);
+
+            // cycle 해결된 뒤에 다시 Run 실행하면 원상복구되어야 함
+            scriptChild1.UpdatePropertyFormula("y", "10");
+            tc.Run();
+            Assert.False(tc.TableAnalyzer.GetSummary().IsCyclic);
+            Assert.Equal(FormulaValue.NewNumberValue(10.0f),
+                tc.RuntimeRepository.GetTableById(new TableId("idChild1"))?.GetProperty("x")
+            );
         }
     }
 }

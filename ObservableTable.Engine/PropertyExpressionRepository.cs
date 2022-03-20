@@ -11,7 +11,7 @@ namespace ObservableTable.Engine
 
         public Expression? GetPropertyExpression(PropertyDescriptor desc)
         {
-            return _propertyExpressions[desc];
+            return _propertyExpressions.TryGetValue(desc, out var result) ? result : null;
         }
 
         internal void SetPropertyExpression(PropertyDescriptor desc, Expression expr)

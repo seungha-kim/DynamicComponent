@@ -13,6 +13,11 @@ namespace ObservableTable.Engine
             Name = name;
         }
 
+        public override string ToString()
+        {
+            return $"{ID.InternalID}!{Name}";
+        }
+
         public bool Equals(PropertyDescriptor other)
         {
             return ID.Equals(other.ID) && Name == other.Name;

@@ -38,6 +38,17 @@ namespace ObservableTable.Engine
             return _scripts[parentId];
         }
 
+        public IEnumerable<PropertyDescriptor> GetAllProperties()
+        {
+            foreach (var script in _scripts.Values)
+            {
+                foreach (var propertyName in script.GetPropertyNames())
+                {
+                    yield return new PropertyDescriptor(script.ID, propertyName);
+                }
+            }
+        }
+
         public event TableParentUpdateDelegate OnParentUpdate = delegate { };
 
         public event PropertyInvalidateDelegate OnPropertyUpdated = delegate { };

@@ -8,7 +8,7 @@ namespace ObservableTable.Engine
         internal IEnumerable<PropertyDescriptor> GetReferences(PropertyDescriptor desc);
         internal IEnumerable<PropertyDescriptor> GetObservers(PropertyDescriptor desc);
         internal bool IsCyclic { get; }
-        internal IEnumerable<PropertyDescriptor>? GetReferenceCycle();
+        internal IEnumerable<PropertyDescriptor>? GetAllReferenceCycle();
         internal bool IsPropertyInCycle(PropertyDescriptor desc);
         internal IEnumerable<PropertyDescriptor> GetPropertyInvalidationSet();
     }

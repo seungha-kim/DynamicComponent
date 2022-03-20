@@ -22,7 +22,7 @@ namespace ObservableTable.Engine
         {
             if (context.AnalysisSummary.IsCyclic)
             {
-                throw new Exception("TODO: cyclic");
+                return;
             }
 
             foreach (var createdTableId in context.TableModificationSummary.CreatedTableIds)
