@@ -32,7 +32,7 @@ namespace ObservableTable.Engine
             }
         }
 
-        private Dictionary<string, string> Formulas { get; } = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _formulas = new Dictionary<string, string>();
 
         public event PropertyInvalidateDelegate OnPropertyFormulaUpdate = delegate { };
         public event PropertyInvalidateDelegate OnPropertyFormulaRemoved = delegate { };
@@ -42,28 +42,28 @@ namespace ObservableTable.Engine
 
         public IEnumerable<string> GetPropertyNames()
         {
-            return Formulas.Keys;
+            return _formulas.Keys;
         }
 
         public bool HasProperty(string name)
         {
-            return Formulas.ContainsKey(name);
+            return _formulas.ContainsKey(name);
         }
 
         public string? GetPropertyFormula(string name)
         {
-            return Formulas.TryGetValue(name, out var value) ? value : null;
+            return _formulas.TryGetValue(name, out var value) ? value : null;
         }
 
         public void UpdatePropertyFormula(string name, string formula)
         {
-            Formulas[name] = formula;
+            _formulas[name] = formula;
             OnPropertyFormulaUpdate.Invoke(this, name);
         }
 
         public void RemovePropertyFormula(string name)
         {
-            Formulas.Remove(name);
+            _formulas.Remove(name);
             OnPropertyFormulaRemoved.Invoke(this, name);
         }
     }

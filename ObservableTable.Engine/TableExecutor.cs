@@ -83,18 +83,18 @@ namespace ObservableTable.Engine
 
         private class EvaluationContext : IEvaluationContext
         {
-            private TableId ID { get; }
-            private TableExecuteContext _executeContext;
+            private readonly TableId _id;
+            private readonly TableExecuteContext _executeContext;
 
             internal EvaluationContext(TableId id, TableExecuteContext executeContext)
             {
-                ID = id;
+                _id = id;
                 _executeContext = executeContext;
             }
 
             public FormulaValue GetIdentifierValue(string name)
             {
-                var table = _executeContext.RuntimeRepository.GetTableById(ID);
+                var table = _executeContext.RuntimeRepository.GetTableById(_id);
                 if (table is null) return FormulaValue.NullValue;
 
                 var prop = table.GetProperty(name);
@@ -105,7 +105,7 @@ namespace ObservableTable.Engine
             {
                 // TODO: self property?
 
-                var parent = _executeContext.RuntimeRepository.GetParent(ID);
+                var parent = _executeContext.RuntimeRepository.GetParent(_id);
                 if (parent is null) return FormulaValue.NullValue;
                 if (parent.Name == receiver)
                 {

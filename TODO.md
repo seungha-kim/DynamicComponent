@@ -1,5 +1,5 @@
 - [] 파싱 에러 처리 (에러 지점 기록되어야 함)
 - [] 평가 에러 처리 (에러 지점 출력되어야 함)
-- [] private property -> private field (대문자로 시작하는게 역시 익숙치 않다)
 - [] XXXReader 추상클래스로 구현하고 자식클래스는 sealed
 - [] F# 버전 꼬여있음
+- [] 테이블과 속성이 삭제되는 경우에 대한 내부 상태 (reference/observer 등) 테스트

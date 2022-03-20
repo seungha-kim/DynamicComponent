@@ -15,7 +15,7 @@ namespace ObservableTable.Engine
 
         private readonly Dictionary<PropertyDescriptor, HashSet<PropertyDescriptor>> _observers;
         private readonly Dictionary<PropertyDescriptor, HashSet<PropertyDescriptor>> _references;
-        private IEnumerable<PropertyDescriptor>? Cycle { get; set; }
+        private IEnumerable<PropertyDescriptor>? _cycle;
 
         internal TableAnalyzer()
         {
@@ -141,7 +141,7 @@ namespace ObservableTable.Engine
         /// </summary>
         private void CheckCycle(TableAnalyzeContext context)
         {
-            Cycle = null;
+            _cycle = null;
             // TODO: 기억하고 있는 reference/observer 정보를 이용해 변경된 건에 한해서만 탐색하기 - 이미 cycle 이 있을때/없을때 다르게
 
             var notVisited = context.ScriptRepository.GetAllProperties().ToHashSet();
@@ -179,7 +179,7 @@ namespace ObservableTable.Engine
                 return result;
             }
 
-            if (cycle.Any()) Cycle = cycle;
+            if (cycle.Any()) _cycle = cycle;
         }
 
         private class ParsingContext : IParsingContext
@@ -208,16 +208,16 @@ namespace ObservableTable.Engine
                 foreach (var r in observers) yield return r;
             }
 
-            bool ITableAnalysisSummary.IsCyclic => _analyzer.Cycle is { };
+            bool ITableAnalysisSummary.IsCyclic => _analyzer._cycle is { };
 
             IEnumerable<PropertyDescriptor>? ITableAnalysisSummary.GetAllReferenceCycle()
             {
-                return _analyzer.Cycle;
+                return _analyzer._cycle;
             }
 
             bool ITableAnalysisSummary.IsPropertyInCycle(PropertyDescriptor desc)
             {
-                return _analyzer.Cycle?.Contains(desc) ?? false;
+                return _analyzer._cycle?.Contains(desc) ?? false;
             }
 
             IEnumerable<PropertyDescriptor> ITableAnalysisSummary.GetPropertyInvalidationSet()
