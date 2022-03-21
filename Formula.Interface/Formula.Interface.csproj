@@ -7,11 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Formula.AST.Deprecated\Formula.AST.Deprecated.fsproj" />
-      <ProjectReference Include="..\Formula.AST\Formula.AST.fsproj" />
-      <ProjectReference Include="..\Formula.Errors.Deprecated\Formula.Errors.Deprecated.fsproj" />
-      <ProjectReference Include="..\Formula.ValueRepresentation.Deprecated\Formula.ValueRepresentation.Deprecated.fsproj" />
-      <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj" />
+        <ProjectReference Include="..\Formula.AST\Formula.AST.fsproj"/>
+        <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj"/>
     </ItemGroup>
 
 </Project>

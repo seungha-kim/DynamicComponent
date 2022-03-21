@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Formula.ValueRepresentation;
 using Xunit;
-using ObservableTable.Engine;
 
 namespace ObservableTable.Engine.Tests
 {
@@ -75,61 +73,61 @@ namespace ObservableTable.Engine.Tests
             {
                 // x -> y
                 var references = analysis.GetReferences(new PropertyDescriptor(new TableId("idChild1"), "x")).ToList();
-                Assert.Equal(references.Count, 1);
-                Assert.True(references.Contains(new PropertyDescriptor(new TableId("idChild1"), "y")));
+                Assert.Single(references);
+                Assert.Contains(new PropertyDescriptor(new TableId("idChild1"), "y"), references);
             }
 
             {
                 // y -> ?
                 var references = analysis.GetReferences(new PropertyDescriptor(new TableId("idChild1"), "y")).ToList();
-                Assert.Equal(references.Count, 0);
+                Assert.Empty(references);
             }
 
             {
                 // z -> parent!a, y
                 var references = analysis.GetReferences(new PropertyDescriptor(new TableId("idChild1"), "z")).ToList();
-                Assert.Equal(references.Count, 2);
-                Assert.True(references.Contains(new PropertyDescriptor(new TableId("idChild1"), "y")));
-                Assert.True(references.Contains(new PropertyDescriptor(new TableId("idParent"), "a")));
+                Assert.Equal(2, references.Count);
+                Assert.Contains(new PropertyDescriptor(new TableId("idChild1"), "y"), references);
+                Assert.Contains(new PropertyDescriptor(new TableId("idParent"), "a"), references);
             }
 
             {
                 // a -> ?
                 var references = analysis.GetReferences(new PropertyDescriptor(new TableId("idParent"), "a")).ToList();
-                Assert.Equal(references.Count, 0);
+                Assert.Empty(references);
             }
 
             {
                 // parent!a <- z
                 var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("idParent"), "a")).ToList();
-                Assert.Equal(observers.Count, 1);
-                Assert.True(observers.Contains(new PropertyDescriptor(new TableId("idChild1"), "z")));
+                Assert.Single(observers);
+                Assert.Contains(new PropertyDescriptor(new TableId("idChild1"), "z"), observers);
             }
 
             {
                 // z <- w
                 var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("idChild1"), "z")).ToList();
-                Assert.Equal(observers.Count, 1);
+                Assert.Single(observers);
             }
 
             {
                 // w <- ?
                 var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("idChild1"), "w")).ToList();
-                Assert.Equal(observers.Count, 0);
+                Assert.Empty(observers);
             }
 
             {
                 // y <- x, z
                 var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("idChild1"), "y")).ToList();
-                Assert.Equal(observers.Count, 2);
-                Assert.True(observers.Contains(new PropertyDescriptor(new TableId("idChild1"), "x")));
-                Assert.True(observers.Contains(new PropertyDescriptor(new TableId("idChild1"), "z")));
+                Assert.Equal(2, observers.Count);
+                Assert.Contains(new PropertyDescriptor(new TableId("idChild1"), "x"), observers);
+                Assert.Contains(new PropertyDescriptor(new TableId("idChild1"), "z"), observers);
             }
 
             {
                 // x <- ?
                 var observers = analysis.GetObservers(new PropertyDescriptor(new TableId("idChild1"), "x")).ToList();
-                Assert.Equal(observers.Count, 0);
+                Assert.Empty(observers);
             }
         }
 

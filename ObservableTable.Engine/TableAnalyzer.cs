@@ -52,7 +52,7 @@ namespace ObservableTable.Engine
         private void UpdatePropertyState(TableAnalyzeContext context, PropertyDescriptor desc)
         {
             var formula =
-                context.ScriptRepository.GetTableScript(desc.ID)!.GetPropertyFormula(desc.Name)!;
+                context.ScriptRepository.GetTableScript(desc.ID).GetPropertyFormula(desc.Name)!;
 
             if (context.PropertyExpressionRepository.GetPropertyExpression(desc) is { } oldExpr)
             {
@@ -94,7 +94,8 @@ namespace ObservableTable.Engine
             }
         }
 
-        private PropertyDescriptor ExprToPropertyDescriptor(Expression expr, TableId scope, TableAnalyzeContext context)
+        private static PropertyDescriptor ExprToPropertyDescriptor(Expression expr, TableId scope,
+            TableAnalyzeContext context)
         {
             var tableScriptRepository = context.ScriptRepository;
             if (expr.IsIdent)
@@ -188,7 +189,7 @@ namespace ObservableTable.Engine
 
         private class TableAnalysisSummary : ITableAnalysisSummary
         {
-            private TableAnalyzer _analyzer;
+            private readonly TableAnalyzer _analyzer;
 
             internal TableAnalysisSummary(TableAnalyzer analyzer)
             {
