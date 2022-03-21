@@ -144,7 +144,7 @@ namespace ObservableTable.Engine
             _cycle = null;
             // TODO: 기억하고 있는 reference/observer 정보를 이용해 변경된 건에 한해서만 탐색하기 - 이미 cycle 이 있을때/없을때 다르게
 
-            var notVisited = context.ScriptRepository.GetAllProperties().ToHashSet();
+            var notVisited = new HashSet<PropertyDescriptor>(context.ScriptRepository.GetAllProperties());
             var cycle = new HashSet<PropertyDescriptor>();
 
             while (notVisited.Any())

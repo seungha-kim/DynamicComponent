@@ -25,8 +25,8 @@ let numberExprData: obj [] list =
       [| FunctionExpr("ABS", [ FunctionExpr("ADD", [ NumberLit "-1"; NumberLit "10" ]) ])
          NumberValue 9.0f |] ]
 
-[<Theory; MemberData(nameof (numberExprData))>]
-let ``Parsing test`` (input: Expression, expected: FormulaValue) =
+[<Theory; MemberData(nameof numberExprData)>]
+let ``Parsing test1`` (input: Expression, expected: FormulaValue) =
     let eval = createEvaluator ()
     let result = eval.Evaluate(ctx, input)
     Assert.Equal(expected, result)

@@ -1,10 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net48</TargetFramework>
 
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
+        <OutputType>Library</OutputType>
+        <LangVersion>default</LangVersion>
+        <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,7 +30,6 @@
     <ItemGroup>
       <ProjectReference Include="..\Formula.AST\Formula.AST.fsproj" />
       <ProjectReference Include="..\Formula.Evaluation\Formula.Evaluation.fsproj" />
-      <ProjectReference Include="..\Formula.Interface\Formula.Interface.csproj" />
       <ProjectReference Include="..\Formula.TestUtil\Formula.TestUtil.csproj" />
       <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj" />
     </ItemGroup>

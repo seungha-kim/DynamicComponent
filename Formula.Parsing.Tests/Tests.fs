@@ -50,7 +50,7 @@ let expressionData: obj [] list =
       [| "ABS(1) + ADD(2, 3)"
          AddOp(FunctionExpr("ABS", [ NumberLit "1" ]), FunctionExpr("ADD", [ NumberLit "2"; NumberLit "3" ])) |] ]
 
-[<Theory; MemberData(nameof (expressionData))>]
+[<Theory; MemberData(nameof expressionData)>]
 let ``Parsing test`` (input: string, expected: Expression) =
     let parser = createParser ()
     let expr = parser.Parse(ctx, input)

@@ -1,68 +1,20 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-    <Import Project="..\packages\FSharp.Compiler.Tools.10.0.2\build\FSharp.Compiler.Tools.props" Condition="Exists('..\packages\FSharp.Compiler.Tools.10.0.2\build\FSharp.Compiler.Tools.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
     <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{A4876C75-38CB-4546-B3B8-0A0C59E377EE}</ProjectGuid>
-        <OutputType>Library</OutputType>
-        <RootNamespace>Formula.Evaluation</RootNamespace>
-        <AssemblyName>Formula.Evaluation</AssemblyName>
-        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <LangVersion>4.7</LangVersion>
     </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>portable</DebugType>
-        <Optimize>false</Optimize>
-        <Tailcalls>false</Tailcalls>
-        <OutputPath>bin\$(Configuration)\</OutputPath>
-        <DefineConstants>DEBUG;TRACE</DefineConstants>
-        <WarningLevel>3</WarningLevel>
-        <OtherFlags>--warnon:1182</OtherFlags>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <DebugType>pdbonly</DebugType>
-        <Optimize>true</Optimize>
-        <Tailcalls>true</Tailcalls>
-        <OutputPath>bin\$(Configuration)\</OutputPath>
-        <DefineConstants>TRACE</DefineConstants>
-        <WarningLevel>3</WarningLevel>
-        <OtherFlags>--warnon:1182</OtherFlags>
-    </PropertyGroup>
+
     <ItemGroup>
-        <Reference Include="mscorlib" />
-        <Reference Include="System" />
-        <Reference Include="System.Core" />
-        <Reference Include="System.Numerics" />
-        <Reference Include="FSharp.Core">
-            <HintPath>..\packages\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
-        </Reference>
+      <Compile Include="Library.fs" />
     </ItemGroup>
+
     <ItemGroup>
-        <Compile Include="AssemblyInfo.fs" />
-        <Compile Include="Library.fs" />
-        <None Include="Script.fsx" />
-        <Content Include="packages.config" />
+      <ProjectReference Include="..\Formula.AST\Formula.AST.fsproj" />
+      <ProjectReference Include="..\Formula.Errors\Formula.Errors.fsproj" />
+      <ProjectReference Include="..\Formula.Interface\Formula.Interface.csproj" />
+      <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj" />
     </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\Formula.AST\Formula.AST.fsproj">
-        <Project>{b31ab31c-da1e-46be-8522-207ce9f45003}</Project>
-        <Name>Formula.AST</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Formula.Errors\Formula.Errors.fsproj">
-        <Project>{e49b338c-d233-41a2-9da4-3d751d751a1c}</Project>
-        <Name>Formula.Errors</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Formula.Interface\Formula.Interface.csproj">
-        <Project>{484317e1-3a6a-4075-8089-9cf5f469873d}</Project>
-        <Name>Formula.Interface</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Formula.ValueRepresentation\Formula.ValueRepresentation.fsproj">
-        <Project>{1f366fa6-2af2-40a2-b51e-ad0fe451707c}</Project>
-        <Name>Formula.ValueRepresentation</Name>
-      </ProjectReference>
-    </ItemGroup>
-    <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
+
 </Project>
