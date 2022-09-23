@@ -48,7 +48,13 @@ let expressionData: obj [] list =
       [| "  ADD  (  1  ,  2  )  "
          FunctionExpr("ADD", [ NumberLit "1"; NumberLit "2" ]) |]
       [| "ABS(1) + ADD(2, 3)"
-         AddOp(FunctionExpr("ABS", [ NumberLit "1" ]), FunctionExpr("ADD", [ NumberLit "2"; NumberLit "3" ])) |] ]
+         AddOp(FunctionExpr("ABS", [ NumberLit "1" ]), FunctionExpr("ADD", [ NumberLit "2"; NumberLit "3" ])) |]
+      [| "ADD(ADD(1, 2), 3)"
+         FunctionExpr(
+             "ADD",
+             [ FunctionExpr("ADD", [ NumberLit "1"; NumberLit "2" ])
+               NumberLit "3" ]
+         ) |] ]
 
 [<Theory; MemberData(nameof expressionData)>]
 let ``Parsing test`` (input: string, expected: Expression) =
